@@ -1,8 +1,8 @@
 package posts
 
 import (
-	"path/filepath"
 	"io/ioutil"
+	"path/filepath"
 	"regexp"
 
 	log "github.com/sirupsen/logrus"
