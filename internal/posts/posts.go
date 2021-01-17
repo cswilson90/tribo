@@ -22,13 +22,8 @@ type Post struct {
 func FindPosts(baseDir string) Posts {
 	log.Infof("Looking for posts recursivly in '%v'", baseDir)
 
-	// Save which directories we've seen before to avoid circular references
-	// causing an infinite loop
-	seenLists := make(DirSet)
-
 	toProcess := list.New()
 	toProcess.PushBack(baseDir)
-	seenLists[baseDir] = true
 
 	posts := make(Posts, 0)
 
@@ -49,6 +44,7 @@ func FindPosts(baseDir string) Posts {
 		for _, file := range fileList {
 			if metaDataMatch.MatchString(file.Name()) {
 				posts = append(posts, &Post{nextDir})
+				log.Debugf("Found post in '%v'", nextDir)
 				continue
 			}
 		}
@@ -57,14 +53,9 @@ func FindPosts(baseDir string) Posts {
 		for _, file := range fileList {
 			if file.IsDir() {
 				newDir := filepath.Join(nextDir, file.Name())
-				if !seenLists[newDir] {
-					toProcess.PushBack(newDir)
-					seenLists[newDir] = true
-				}
+				toProcess.PushBack(newDir)
 			}
 		}
-
-		log.Debugf("Found %v posts in '%v'", len(posts), nextDir)
 	}
 
 	log.Infof("Found %v posts in '%v'", len(posts), baseDir)
