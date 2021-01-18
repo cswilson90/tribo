@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"regexp"
+	"runtime"
+	"sync"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -20,8 +22,40 @@ type Post struct {
 	dir string
 }
 
+// BuildPosts finds all the posts in a directory and builds them.
+func BuildPosts(baseDir string) {
+	posts := findPosts(baseDir)
+
+	// Build posts in parallel
+	// TODO make number of workers configurable
+	numWorkers := runtime.NumCPU()
+	var wg sync.WaitGroup
+	postJobs := make(chan *Post, numWorkers)
+
+	for i := 0; i < numWorkers; i++ {
+		wg.Add(1)
+		go buildPosts(postJobs, &wg)
+	}
+
+	for _, post := range posts {
+		postJobs <- post
+	}
+	close(postJobs)
+	wg.Wait()
+}
+
+func buildPosts(posts <-chan *Post, wg *sync.WaitGroup) {
+	for {
+		post, more := <-posts
+		if !more {
+			return
+		}
+		post.build()
+	}
+}
+
 // FindPosts recursively searches a directory for posts.
-func FindPosts(baseDir string) Posts {
+func findPosts(baseDir string) Posts {
 	log.Infof("Looking for posts recursivly in '%v'", baseDir)
 
 	toProcess := list.New()
@@ -62,6 +96,8 @@ func FindPosts(baseDir string) Posts {
 	return posts
 }
 
+// newPost checks if the given directory is a post directory and creates a post if so.
+// Returns an error if the directory is not a post directory.
 func newPost(dir string) (*Post, error) {
 	fileList, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -85,7 +121,13 @@ func newPost(dir string) (*Post, error) {
 
 	if !(metadata && content) {
 		log.Errorf("Dir '%v' is missing metadata or content file", dir)
+		return nil, fmt.Errorf("Dir '%v' is not a post directory", dir)
 	}
 
 	return &Post{dir}, nil
+}
+
+// build builds the post from the directory set in the object.
+func (p *Post) build() {
+
 }

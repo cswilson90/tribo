@@ -10,7 +10,5 @@ import (
 
 func RunTribo() {
 	postsDir := flag.String("postsDir", "posts", "posts directory")
-	posts := posts.FindPosts(*postsDir)
-
-	log.Infof("Found %v posts", len(posts))
+	posts.BuildPosts(*postsDir)
 }
