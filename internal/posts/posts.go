@@ -68,16 +68,23 @@ func newPost(dir string) (*Post, error) {
 		return nil, err
 	}
 
-	// If the directory contains a metadata file it's a post directory
-	var metadataFile string
+	// If the directory contains a metadata file and a content file it's a post directory
+	metadata, content := false, false
 	for _, file := range fileList {
 		if metaDataMatch.MatchString(file.Name()) {
-			metadataFile = filepath.Join(dir, file.Name())
+			metadata = true
+		}
+		if file.Name() == "content.md" {
+			content = true
 		}
 	}
 
-	if metadataFile == "" {
+	if !metadata && !content {
 		return nil, fmt.Errorf("Dir '%v' is not a post directory", dir)
+	}
+
+	if !(metadata && content) {
+		log.Errorf("Dir '%v' is missing metadata or content file", dir)
 	}
 
 	return &Post{dir}, nil
