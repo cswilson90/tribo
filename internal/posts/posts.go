@@ -5,14 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"sync"
 
 	log "github.com/sirupsen/logrus"
 )
-
-var metaDataMatch = regexp.MustCompile(`^metadata\.(json|ya?ml)$`)
 
 type DirSet map[string]bool
 
@@ -107,7 +104,7 @@ func newPost(dir string) (*Post, error) {
 	// If the directory contains a metadata file and a content file it's a post directory
 	metadata, content := false, false
 	for _, file := range fileList {
-		if metaDataMatch.MatchString(file.Name()) {
+		if isMetadataFile(file.Name()) {
 			metadata = true
 		}
 		if file.Name() == "content.md" {

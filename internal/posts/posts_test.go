@@ -8,7 +8,7 @@ import (
 )
 
 func TestPosts(t *testing.T) {
-	log.SetLevel(log.ErrorLevel)
+	log.SetLevel(log.FatalLevel)
 	posts := findPosts("testdata")
 	assert.Equal(t, 3, len(posts), "Incorrect number of posts found")
 }
