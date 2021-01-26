@@ -16,12 +16,19 @@ type DirSet map[string]bool
 type Posts []*Post
 
 type Post struct {
-	dir string
+	dir      string
+	metadata *PostMetadata
 }
 
 // BuildPosts finds all the posts in a directory and builds them.
+// The provided directory is converted to an absolute directory before use.
 func BuildPosts(baseDir string) {
-	posts := findPosts(baseDir)
+	absDir, err := filepath.Abs(baseDir)
+	if err != nil {
+		log.Fatalf("Failed to absolute path of dir '%v': "+err.Error(), baseDir)
+	}
+
+	posts := findPosts(absDir)
 
 	// Build posts in parallel
 	// TODO make number of workers configurable
@@ -121,10 +128,17 @@ func newPost(dir string) (*Post, error) {
 		return nil, fmt.Errorf("Dir '%v' is not a post directory", dir)
 	}
 
-	return &Post{dir}, nil
+	return &Post{
+		dir: dir,
+	}, nil
 }
 
 // build builds the post from the directory set in the object.
 func (p *Post) build() {
-
+	var err error
+	p.metadata, err = parseMetadata(p.dir)
+	if err != nil {
+		log.Errorf(err.Error())
+		return
+	}
 }
