@@ -16,8 +16,9 @@ type DirSet map[string]bool
 type Posts []*Post
 
 type Post struct {
-	dir      string
-	metadata *PostMetadata
+	dir         string
+	contentFile string
+	metadata    *PostMetadata
 }
 
 // BuildPosts finds all the posts in a directory and builds them.
@@ -109,27 +110,28 @@ func newPost(dir string) (*Post, error) {
 	}
 
 	// If the directory contains a metadata file and a content file it's a post directory
-	metadata, content := false, false
+	metadata, content := false, ""
 	for _, file := range fileList {
 		if isMetadataFile(file.Name()) {
 			metadata = true
 		}
 		if file.Name() == "content.md" {
-			content = true
+			content = filepath.Join(dir, file.Name())
 		}
 	}
 
-	if !metadata && !content {
+	if !metadata && content == "" {
 		return nil, fmt.Errorf("Dir '%v' is not a post directory", dir)
 	}
 
-	if !(metadata && content) {
+	if !(metadata && content != "") {
 		log.Errorf("Dir '%v' is missing metadata or content file", dir)
 		return nil, fmt.Errorf("Dir '%v' is not a post directory", dir)
 	}
 
 	return &Post{
-		dir: dir,
+		dir:         dir,
+		contentFile: content,
 	}, nil
 }
 
@@ -138,7 +140,7 @@ func (p *Post) build() {
 	var err error
 	p.metadata, err = parseMetadata(p.dir)
 	if err != nil {
-		log.Errorf(err.Error())
+		log.Errorf("Error building post in '%v': "+err.Error(), p.dir)
 		return
 	}
 }
