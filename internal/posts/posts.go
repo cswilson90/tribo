@@ -4,11 +4,13 @@ import (
 	"container/list"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
 
+	"github.com/gomarkdown/markdown"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -69,7 +71,10 @@ func buildPosts(outputDir string, posts <-chan *Post, wg *sync.WaitGroup) {
 		if !more {
 			return
 		}
-		post.build(outputDir)
+		err := post.build(outputDir)
+		if err != nil {
+			log.Errorf("Error building post in '%v': "+err.Error(), post.dir)
+		}
 	}
 }
 
@@ -150,17 +155,16 @@ func newPost(dir string) (*Post, error) {
 }
 
 // build builds the post from the directory set in the object.
-func (p *Post) build(outputDir string) {
+func (p *Post) build(outputDir string) error {
 	var err error
 	p.metadata, err = parseMetadata(p.dir)
 	if err != nil {
-		log.Errorf("Error building post in '%v': "+err.Error(), p.dir)
-		return
+		return err
 	}
 
+	// Build filepath for post from publish date and linkname
 	year := p.metadata.publishDate.Format("2006")
 	month := p.metadata.publishDate.Format("01")
-
 	p.urlPath = strings.Join([]string{year, month, p.metadata.linkName}, "/")
 	p.outputDir = filepath.Join(outputDir, year, month, p.metadata.linkName)
 
@@ -168,9 +172,27 @@ func (p *Post) build(outputDir string) {
 	uniqueDirsLock.Lock()
 	duplicate, exists := uniqueDirs[p.outputDir]
 	if exists {
-		log.Errorf("Error building post in '%v': same output directory as '%v'", p.dir, duplicate.dir)
-		return
+		return fmt.Errorf("Same output directory as '%v'", duplicate.dir)
 	}
 	uniqueDirs[p.outputDir] = p
 	uniqueDirsLock.Unlock()
+
+	// Make output directory
+	err = os.MkdirAll(p.outputDir, 0775)
+	if err != nil {
+		return err
+	}
+
+	// Read markdown content and convert to HTML
+	mdContent, err := ioutil.ReadFile(p.contentFile)
+	if err != nil {
+		return err
+	}
+	htmlContent := markdown.ToHTML(mdContent, nil, nil)
+
+	// Write html content to output file
+	indexFile := filepath.Join(p.outputDir, "index.html")
+	ioutil.WriteFile(indexFile, htmlContent, 0664)
+
+	return nil
 }
