@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 
 	log "github.com/sirupsen/logrus"
@@ -17,19 +18,26 @@ type Posts []*Post
 
 type Post struct {
 	dir         string
+	outputDir   string
 	contentFile string
-	metadata    *PostMetadata
+
+	urlPath  string
+	metadata *PostMetadata
 }
 
 // BuildPosts finds all the posts in a directory and builds them.
 // The provided directory is converted to an absolute directory before use.
-func BuildPosts(baseDir string) {
-	absDir, err := filepath.Abs(baseDir)
+func BuildPosts(inputDir, outputDir string) {
+	absInputDir, err := filepath.Abs(inputDir)
 	if err != nil {
-		log.Fatalf("Failed to absolute path of dir '%v': "+err.Error(), baseDir)
+		log.Fatalf("Failed to absolute path of dir '%v': "+err.Error(), inputDir)
+	}
+	absOutputDir, err := filepath.Abs(outputDir)
+	if err != nil {
+		log.Fatalf("Failed to absolute path of dir '%v': "+err.Error(), outputDir)
 	}
 
-	posts := findPosts(absDir)
+	posts := findPosts(absInputDir)
 
 	// Build posts in parallel
 	// TODO make number of workers configurable
@@ -39,7 +47,7 @@ func BuildPosts(baseDir string) {
 
 	for i := 0; i < numWorkers; i++ {
 		wg.Add(1)
-		go buildPosts(postJobs, &wg)
+		go buildPosts(absOutputDir, postJobs, &wg)
 	}
 
 	for _, post := range posts {
@@ -49,13 +57,14 @@ func BuildPosts(baseDir string) {
 	wg.Wait()
 }
 
-func buildPosts(posts <-chan *Post, wg *sync.WaitGroup) {
+// buildPosts gets posts from a channel and builds them.
+func buildPosts(outputDir string, posts <-chan *Post, wg *sync.WaitGroup) {
 	for {
 		post, more := <-posts
 		if !more {
 			return
 		}
-		post.build()
+		post.build(outputDir)
 	}
 }
 
@@ -136,11 +145,18 @@ func newPost(dir string) (*Post, error) {
 }
 
 // build builds the post from the directory set in the object.
-func (p *Post) build() {
+func (p *Post) build(outputDir string) {
 	var err error
 	p.metadata, err = parseMetadata(p.dir)
 	if err != nil {
 		log.Errorf("Error building post in '%v': "+err.Error(), p.dir)
 		return
 	}
+
+	year := p.metadata.publishDate.Format("2006")
+	month := p.metadata.publishDate.Format("01")
+
+	// TODO make sure dir is unique for each post
+	p.urlPath = strings.Join([]string{year, month, p.metadata.linkName}, "/")
+	p.outputDir = filepath.Join(outputDir, year, month, p.metadata.linkName)
 }

@@ -12,14 +12,33 @@ import (
 var today = time.Now().Format(dateFormat)
 
 var tests = []struct {
-	dir   string
-	title string
-	date  string
-	tags  []string
+	dir      string
+	title    string
+	linkName string
+	date     string
+	tags     []string
 }{
-	{"testdata/2021/01/post1/", "2021 01 Post 1", "2021-01-24", []string{"happy", "upbeat"}},
-	{"testdata/2021/01/post2/", "2021 01 Post 2", today, []string{"jolly"}},
-	{"testdata/2020/12/post2/", "2020 12 Post 2", "2020-12-04", nil},
+	{
+		dir:      "testdata/2021/01/post1/",
+		title:    "2021 01 Post 1",
+		linkName: "2021-01-post-1",
+		date:     "2021-01-24",
+		tags:     []string{"happy", "upbeat"},
+	},
+	{
+		dir:      "testdata/2021/01/post2/",
+		title:    "2021 01 Post 2",
+		linkName: "post2-2021-01",
+		date:     today,
+		tags:     []string{"jolly"},
+	},
+	{
+		dir:      "testdata/2020/12/post2/",
+		title:    "2020 12 Post 2",
+		linkName: "post-2-202012",
+		date:     "2020-12-04",
+		tags:     nil,
+	},
 }
 
 var errorTests = []struct {
@@ -47,6 +66,7 @@ func TestMetadata(t *testing.T) {
 			}
 
 			assert.Equal(tc.title, metaData.title, "Title incorrect")
+			assert.Equal(tc.linkName, metaData.linkName, "Link name incorrect")
 			assert.Equal(tc.date, metaData.publishDate.Format(dateFormat), "Date incorrect")
 			assert.Equal(tc.tags, metaData.tags, "Tags incorrect")
 		})
