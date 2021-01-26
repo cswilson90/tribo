@@ -7,6 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TODO when output is produced
+// * Add test for duplicate checking
+
 func TestPosts(t *testing.T) {
 	log.SetLevel(log.FatalLevel)
 	posts := findPosts("testdata")

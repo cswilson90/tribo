@@ -12,9 +12,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type DirSet map[string]bool
+type (
+	DirSet map[string]bool
+	Posts  []*Post
+)
 
-type Posts []*Post
+// Keeps track of seen directories to catch duplicates
+var uniqueDirs = make(map[string]*Post)
+var uniqueDirsLock sync.Mutex
 
 type Post struct {
 	dir         string
@@ -156,7 +161,16 @@ func (p *Post) build(outputDir string) {
 	year := p.metadata.publishDate.Format("2006")
 	month := p.metadata.publishDate.Format("01")
 
-	// TODO make sure dir is unique for each post
 	p.urlPath = strings.Join([]string{year, month, p.metadata.linkName}, "/")
 	p.outputDir = filepath.Join(outputDir, year, month, p.metadata.linkName)
+
+	// Do a uniqueness check on directory name
+	uniqueDirsLock.Lock()
+	duplicate, exists := uniqueDirs[p.outputDir]
+	if exists {
+		log.Errorf("Error building post in '%v': same output directory as '%v'", p.dir, duplicate.dir)
+		return
+	}
+	uniqueDirs[p.outputDir] = p
+	uniqueDirsLock.Unlock()
 }
