@@ -49,6 +49,10 @@ func BuildPosts(inputDir, outputDir string) {
 	// Build posts in parallel
 	// TODO make number of workers configurable
 	numWorkers := runtime.NumCPU()
+	if numWorkers > len(posts) {
+		numWorkers = len(posts)
+	}
+
 	var wg sync.WaitGroup
 	postJobs := make(chan *Post, numWorkers)
 
@@ -66,6 +70,8 @@ func BuildPosts(inputDir, outputDir string) {
 
 // buildPosts gets posts from a channel and builds them.
 func buildPosts(outputDir string, posts <-chan *Post, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	for {
 		post, more := <-posts
 		if !more {
