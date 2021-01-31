@@ -10,5 +10,9 @@ import (
 
 func RunTribo() {
 	postsDir := flag.String("postsDir", "posts", "posts directory")
-	posts.BuildPosts(*postsDir)
+	outputDir := flag.String("outputDir", "blog", "output directory")
+
+	log.SetLevel(log.InfoLevel)
+
+	posts.BuildPosts(*postsDir, *outputDir)
 }

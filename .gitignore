@@ -1,4 +1,5 @@
 *.swp
 
+/blog
 /output
 /posts
