@@ -10,7 +10,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/gomarkdown/markdown"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -189,16 +188,12 @@ func (p *Post) build(outputDir string) error {
 		return err
 	}
 
-	// Read markdown content and convert to HTML
-	mdContent, err := ioutil.ReadFile(p.contentFile)
+	// Generate HTML of post from markdown and templates
+	indexFile := filepath.Join(p.outputDir, "index.html")
+	err = postToHTML(p, indexFile)
 	if err != nil {
 		return err
 	}
-	htmlContent := markdown.ToHTML(mdContent, nil, nil)
-
-	// Write html content to output file
-	indexFile := filepath.Join(p.outputDir, "index.html")
-	ioutil.WriteFile(indexFile, htmlContent, 0664)
 
 	return nil
 }
