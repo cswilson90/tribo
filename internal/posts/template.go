@@ -34,7 +34,7 @@ func postToHTML(post *Post, outputFilename string) error {
 		PostContent: template.HTML(postHTML),
 	}
 
-	templateFile := filepath.Join(config.TemplateDir, "post.html.tmpl")
+	templateFile := filepath.Join(config.Values.TemplateDir, "post.html.tmpl")
 	tmpl, err := template.ParseFiles(templateFile)
 	if err != nil {
 		return err

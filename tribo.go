@@ -7,5 +7,5 @@ import (
 
 func RunTribo() {
 	config.Init()
-	posts.BuildPosts(config.PostsDir, config.OutputDir)
+	posts.BuildPosts(config.Values.PostsDir, config.Values.OutputDir)
 }
