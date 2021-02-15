@@ -19,21 +19,21 @@ var tests = []struct {
 	tags     []string
 }{
 	{
-		dir:      "testdata/2021/01/post1/",
+		dir:      "testdata/posts/2021/01/post1/",
 		title:    "2021 01 Post 1",
 		linkName: "2021-01-post-1",
 		date:     "2021-01-24",
 		tags:     []string{"happy", "upbeat"},
 	},
 	{
-		dir:      "testdata/2021/01/post2/",
+		dir:      "testdata/posts/2021/01/post2/",
 		title:    "2021 01 Post 2",
 		linkName: "post2-2021-01",
 		date:     today,
 		tags:     []string{"jolly"},
 	},
 	{
-		dir:      "testdata/2020/12/post2/",
+		dir:      "testdata/posts/2020/12/post2/",
 		title:    "2020 12 Post 2",
 		linkName: "post-2-202012",
 		date:     "2020-12-04",
@@ -44,11 +44,11 @@ var tests = []struct {
 var errorTests = []struct {
 	dir string
 }{
-	{"testdata/2020/12/not-post/"},
-	{"testdata/errors/no-title/"},
-	{"testdata/errors/invalid-yaml/"},
-	{"testdata/errors/invalid-json/"},
-	{"testdata/errors/invalid-date/"},
+	{"testdata/posts/2020/12/not-post/"},
+	{"testdata/posts/errors/no-title/"},
+	{"testdata/posts/errors/invalid-yaml/"},
+	{"testdata/posts/errors/invalid-json/"},
+	{"testdata/posts/errors/invalid-date/"},
 }
 
 func TestMetadata(t *testing.T) {
