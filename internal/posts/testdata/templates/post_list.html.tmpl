@@ -1,0 +1,18 @@
+<html>
+<head>
+    <title>Blog Posts</title>
+</head>
+
+<body>
+    <h1>All Blog Posts</h1>
+    <div id="post-list">
+        <ul>
+        {{range .}}
+            <li>
+                <a href="{{.Url}}">{{.Title}}</a>
+            </li>
+        {{end}}
+        </ul>
+    </div>
+</body>
+</html>

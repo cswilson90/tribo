@@ -65,6 +65,10 @@ func BuildPosts(inputDir, outputDir string) {
 	}
 	close(postJobs)
 	wg.Wait()
+
+	// Output list of posts HTML
+	indexFile := filepath.Join(absOutputDir, "index.html")
+	postListHTML(posts, indexFile)
 }
 
 // buildPosts gets posts from a channel and builds them.

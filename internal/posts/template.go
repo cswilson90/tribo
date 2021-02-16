@@ -19,6 +19,11 @@ type postData struct {
 	PostContent template.HTML
 }
 
+type postListData struct {
+	Title string
+	Url   string
+}
+
 // postToHTML generates a posts HTML content and writes it to an output file.
 func postToHTML(post *Post, outputFilename string) error {
 	// Read markdown content and convert to HTML
@@ -34,7 +39,23 @@ func postToHTML(post *Post, outputFilename string) error {
 		PostContent: template.HTML(postHTML),
 	}
 
-	templateFile := filepath.Join(config.Values.TemplateDir, "post.html.tmpl")
+	return renderTemplate("post.html.tmpl", outputFilename, tmplData)
+}
+
+func postListHTML(posts Posts, outputFilename string) error {
+	tmplData := make([]postListData, len(posts))
+	for i, post := range posts {
+		tmplData[i] = postListData{
+			Title: post.metadata.title,
+			Url:   post.urlPath,
+		}
+	}
+
+	return renderTemplate("post_list.html.tmpl", outputFilename, tmplData)
+}
+
+func renderTemplate(templateName, outputFilename string, tmplData interface{}) error {
+	templateFile := filepath.Join(config.Values.TemplateDir, templateName)
 	tmpl, err := template.ParseFiles(templateFile)
 	if err != nil {
 		return err

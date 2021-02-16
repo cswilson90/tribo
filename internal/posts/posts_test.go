@@ -52,4 +52,9 @@ func TestBuildPosts(t *testing.T) {
 			t.Errorf("Expected html file '%v' doesn't exist", indexFile)
 		}
 	}
+
+	mainIndex := filepath.Join(tmpDir, "index.html")
+	if _, err := os.Stat(mainIndex); os.IsNotExist(err) {
+		t.Errorf("Expected html file '%v' doesn't exist", mainIndex)
+	}
 }
