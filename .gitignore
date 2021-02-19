@@ -1,5 +1,6 @@
 *.swp
 
-/blog
 /output
-/posts
+
+/example/blog
+/example/.tribo.yaml
