@@ -1,18 +1,14 @@
-<html>
-<head>
-    <title>Blog Posts</title>
-</head>
+{{template "header.html.tmpl" "Blog Posts"}}
 
-<body>
-    <h1>All Blog Posts</h1>
-    <div id="post-list">
-        <ul>
-        {{range .}}
-            <li>
-                <a href="{{.Url}}">{{.Title}}</a>
-            </li>
-        {{end}}
-        </ul>
-    </div>
-</body>
-</html>
+<h1>All Blog Posts</h1>
+<div id="post-list">
+    <ul>
+    {{range .}}
+        <li>
+            <a href="{{.Url}}">{{.Title}}</a>
+        </li>
+    {{end}}
+    </ul>
+</div>
+
+{{template "footer.html.tmpl"}}

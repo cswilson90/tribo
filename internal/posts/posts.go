@@ -43,6 +43,11 @@ func BuildPosts(inputDir, outputDir string) {
 		log.Fatalf("Failed to absolute path of dir '%v': "+err.Error(), outputDir)
 	}
 
+	err = initTemplates()
+	if err != nil {
+		log.Fatalf("Failed to parse post templates: " + err.Error())
+	}
+
 	posts := findPosts(absInputDir)
 
 	// Build posts in parallel

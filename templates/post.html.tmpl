@@ -1,12 +1,8 @@
-<html>
-<head>
-    <title>{{.PageTitle}}</title>
-</head>
+{{template "header.html.tmpl" .PageTitle}}
 
-<body>
-    <h1>{{.PostTitle}}</h1>
-    <div id="post-content">
-        {{.PostContent}}
-    </div>
-</body>
-</html>
+<h1>{{.PostTitle}}</h1>
+<div id="post-content">
+    {{.PostContent}}
+</div>
+
+{{template "footer.html.tmpl"}}

@@ -24,6 +24,27 @@ type postListData struct {
 	Url   string
 }
 
+var tmpl *template.Template
+
+// initTemplates initialises the Template variable for use when generating posts.
+// This function needs to be called before generating post output files.
+func initTemplates() error {
+	includesPattern := filepath.Join(config.Values.TemplateDir, "includes", "*.html.tmpl")
+	var err error
+	tmpl, err = template.ParseGlob(includesPattern)
+	if err != nil {
+		return err
+	}
+
+	templatePattern := filepath.Join(config.Values.TemplateDir, "*.html.tmpl")
+	tmpl, err = tmpl.ParseGlob(templatePattern)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // postToHTML generates a posts HTML content and writes it to an output file.
 func postToHTML(post *Post, outputFilename string) error {
 	// Read markdown content and convert to HTML
@@ -55,12 +76,6 @@ func postListHTML(posts Posts, outputFilename string) error {
 }
 
 func renderTemplate(templateName, outputFilename string, tmplData interface{}) error {
-	templateFile := filepath.Join(config.Values.TemplateDir, templateName)
-	tmpl, err := template.ParseFiles(templateFile)
-	if err != nil {
-		return err
-	}
-
 	outputFile, err := os.Create(outputFilename)
 	if err != nil {
 		return err
@@ -71,7 +86,7 @@ func renderTemplate(templateName, outputFilename string, tmplData interface{}) e
 	outputWriter := bufio.NewWriter(outputFile)
 	defer outputWriter.Flush()
 
-	err = tmpl.Execute(outputWriter, tmplData)
+	err = tmpl.ExecuteTemplate(outputWriter, templateName, tmplData)
 	if err != nil {
 		return err
 	}
