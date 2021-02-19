@@ -16,6 +16,7 @@ var tests = []struct {
 		expectedValues: TriboConfig{
 			OutputDir:   "blog",
 			PostsDir:    "posts",
+			StaticDir:   "static",
 			TemplateDir: "templates",
 		},
 	},
@@ -24,6 +25,7 @@ var tests = []struct {
 		expectedValues: TriboConfig{
 			OutputDir:   "/home/test/output",
 			PostsDir:    "other/posts",
+			StaticDir:   "static",
 			TemplateDir: "templates",
 		},
 	},
@@ -32,6 +34,7 @@ var tests = []struct {
 		expectedValues: TriboConfig{
 			OutputDir:   "/home/test/output",
 			PostsDir:    "posts",
+			StaticDir:   "static",
 			TemplateDir: "other/templates",
 		},
 	},
@@ -46,6 +49,7 @@ func TestConfig(t *testing.T) {
 		expected := tc.expectedValues
 		expected.OutputDir = absPath(expected.OutputDir)
 		expected.PostsDir = absPath(expected.PostsDir)
+		expected.StaticDir = absPath(expected.StaticDir)
 		expected.TemplateDir = absPath(expected.TemplateDir)
 
 		assert.Equal(expected, Values, fmt.Sprintf("Test %v unexpected result", i+1))

@@ -10,7 +10,10 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/otiai10/copy"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/cswilson90/tribo/internal/config"
 )
 
 type (
@@ -70,6 +73,13 @@ func BuildPosts(inputDir, outputDir string) {
 	}
 	close(postJobs)
 	wg.Wait()
+
+	// Copy static files to output dir
+	log.Infof("Copying static files from '%v' to '%v'", config.Values.StaticDir, absOutputDir)
+	err = copy.Copy(config.Values.StaticDir, absOutputDir)
+	if err != nil {
+		log.Fatalf("Failed to copy static files from '%v' to '%v':"+err.Error(), config.Values.StaticDir, absOutputDir)
+	}
 
 	// Output list of posts HTML
 	indexFile := filepath.Join(absOutputDir, "index.html")

@@ -15,6 +15,7 @@ const defaultConfigFile = ".tribo.yaml"
 type TriboConfig struct {
 	OutputDir   string `yaml:"outputDir"`
 	PostsDir    string `yaml:"postsDir"`
+	StaticDir   string `yaml:"staticDir"`
 	TemplateDir string `yaml:"templateDir"`
 }
 
@@ -26,6 +27,7 @@ var (
 	defaultConfig = TriboConfig{
 		OutputDir:   "blog",
 		PostsDir:    "posts",
+		StaticDir:   "static",
 		TemplateDir: "templates",
 	}
 )
@@ -45,6 +47,7 @@ func Init(cmdArgs []string) {
 	configFile := flags.String("configFile", defaultConfigFile, "config file")
 	outputDir := flags.String("outputDir", "", "output directory")
 	postsDir := flags.String("postsDir", "", "posts directory")
+	staticDir := flags.String("staticDir", "", "static files directory")
 	templateDir := flags.String("templateDir", "", "template directory")
 	flags.Parse(cmdArgs)
 
@@ -58,6 +61,9 @@ func Init(cmdArgs []string) {
 	if *postsDir != "" {
 		Values.PostsDir = *postsDir
 	}
+	if *staticDir != "" {
+		Values.StaticDir = *staticDir
+	}
 	if *templateDir != "" {
 		Values.TemplateDir = *templateDir
 	}
@@ -65,6 +71,7 @@ func Init(cmdArgs []string) {
 	// Convert file/path arguments into absolute paths
 	Values.OutputDir = absPath(Values.OutputDir)
 	Values.PostsDir = absPath(Values.PostsDir)
+	Values.StaticDir = absPath(Values.StaticDir)
 	Values.TemplateDir = absPath(Values.TemplateDir)
 }
 

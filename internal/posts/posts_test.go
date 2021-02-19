@@ -13,6 +13,7 @@ import (
 )
 
 const inputDir = "testdata/posts"
+const staticDir = "testdata/static"
 const templateDir = "testdata/templates"
 
 // TODO when output is produced
@@ -27,6 +28,7 @@ func TestFindPosts(t *testing.T) {
 
 func TestBuildPosts(t *testing.T) {
 	log.SetLevel(log.FatalLevel)
+	config.Values.StaticDir = staticDir
 	config.Values.TemplateDir = templateDir
 
 	tmpDir := t.TempDir()
@@ -53,8 +55,11 @@ func TestBuildPosts(t *testing.T) {
 		}
 	}
 
-	mainIndex := filepath.Join(tmpDir, "index.html")
-	if _, err := os.Stat(mainIndex); os.IsNotExist(err) {
-		t.Errorf("Expected html file '%v' doesn't exist", mainIndex)
+	expectedRootFiles := []string{"index.html", "test.css"}
+	for _, file := range expectedRootFiles {
+		mainIndex := filepath.Join(tmpDir, file)
+		if _, err := os.Stat(mainIndex); os.IsNotExist(err) {
+			t.Errorf("Expected html file '%v' doesn't exist", mainIndex)
+		}
 	}
 }
