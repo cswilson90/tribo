@@ -13,15 +13,25 @@ import (
 	"github.com/cswilson90/tribo/internal/config"
 )
 
-type postData struct {
-	PageTitle   string
-	PostTitle   string
-	PostContent template.HTML
+type commonData struct {
+	BlogName  string
+	PageTitle string
 }
 
-type postListData struct {
-	Title string
-	Url   string
+type postData struct {
+	Title   string
+	Content template.HTML
+	Url     string
+}
+
+type postListPageData struct {
+	Common commonData
+	Posts  []postData
+}
+
+type postPageData struct {
+	Common commonData
+	Post   postData
 }
 
 var tmpl *template.Template
@@ -47,28 +57,31 @@ func initTemplates() error {
 
 // postToHTML generates a posts HTML content and writes it to an output file.
 func postToHTML(post *Post, outputFilename string) error {
-	// Read markdown content and convert to HTML
-	mdContent, err := ioutil.ReadFile(post.contentFile)
+	postData, err := postToPostData(post)
 	if err != nil {
 		return err
 	}
-	postHTML := markdown.ToHTML(mdContent, nil, nil)
-
-	tmplData := postData{
-		PageTitle:   post.metadata.title,
-		PostTitle:   post.metadata.title,
-		PostContent: template.HTML(postHTML),
+	tmplData := postPageData{
+		Common: comData(),
+		Post:   postData,
 	}
+
+	tmplData.Common.PageTitle = post.metadata.title
 
 	return renderTemplate("post.html.tmpl", outputFilename, tmplData)
 }
 
 func postListHTML(posts Posts, outputFilename string) error {
-	tmplData := make([]postListData, len(posts))
+	tmplData := postListPageData{
+		Common: comData(),
+		Posts:  make([]postData, len(posts)),
+	}
+
 	for i, post := range posts {
-		tmplData[i] = postListData{
-			Title: post.metadata.title,
-			Url:   post.urlPath,
+		var err error
+		tmplData.Posts[i], err = postToPostData(post)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -92,4 +105,26 @@ func renderTemplate(templateName, outputFilename string, tmplData interface{}) e
 	}
 
 	return nil
+}
+
+func postToPostData(post *Post) (postData, error) {
+	// Read markdown content and convert to HTML
+	mdContent, err := ioutil.ReadFile(post.contentFile)
+	if err != nil {
+		return postData{}, err
+	}
+	postHTML := markdown.ToHTML(mdContent, nil, nil)
+
+	return postData{
+		Title:   post.metadata.title,
+		Content: template.HTML(postHTML),
+		Url:     post.urlPath,
+	}, nil
+}
+
+func comData() commonData {
+	return commonData{
+		BlogName:  config.Values.BlogName,
+		PageTitle: config.Values.BlogName,
+	}
 }

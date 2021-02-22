@@ -13,6 +13,8 @@ import (
 const defaultConfigFile = ".tribo.yaml"
 
 type TriboConfig struct {
+	BlogName string `yaml:"blogTitle"`
+
 	OutputDir   string `yaml:"outputDir"`
 	PostsDir    string `yaml:"postsDir"`
 	StaticDir   string `yaml:"staticDir"`
@@ -25,6 +27,8 @@ var (
 
 	// defaultConfig defines the default values for the config.
 	defaultConfig = TriboConfig{
+		BlogName: "My Blog",
+
 		OutputDir:   "blog",
 		PostsDir:    "posts",
 		StaticDir:   "static",
@@ -45,6 +49,7 @@ func Init(cmdArgs []string) {
 	// Set up and parse flags
 	flags := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	configFile := flags.String("configFile", defaultConfigFile, "config file")
+
 	outputDir := flags.String("outputDir", "", "output directory")
 	postsDir := flags.String("postsDir", "", "posts directory")
 	staticDir := flags.String("staticDir", "", "static files directory")

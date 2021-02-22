@@ -1,9 +1,9 @@
-{{template "header.html.tmpl" "Blog Posts"}}
+{{template "header.html.tmpl" .}}
 
 <h1>All Blog Posts</h1>
 <div id="post-list">
     <ul>
-    {{range .}}
+    {{range .Posts}}
         <li>
             <a href="{{.Url}}">{{.Title}}</a>
         </li>

@@ -14,6 +14,7 @@ var tests = []struct {
 	{
 		flags: []string{},
 		expectedValues: TriboConfig{
+			BlogName:    "My Blog",
 			OutputDir:   "blog",
 			PostsDir:    "posts",
 			StaticDir:   "static",
@@ -23,6 +24,7 @@ var tests = []struct {
 	{
 		flags: []string{"-outputDir", "/home/test/output", "-postsDir", "other/posts"},
 		expectedValues: TriboConfig{
+			BlogName:    "My Blog",
 			OutputDir:   "/home/test/output",
 			PostsDir:    "other/posts",
 			StaticDir:   "static",
@@ -32,6 +34,7 @@ var tests = []struct {
 	{
 		flags: []string{"-configFile", "testdata/test_config.yaml", "-outputDir", "/home/test/output"},
 		expectedValues: TriboConfig{
+			BlogName:    "My Blog",
 			OutputDir:   "/home/test/output",
 			PostsDir:    "posts",
 			StaticDir:   "static",
