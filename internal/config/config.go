@@ -13,7 +13,8 @@ import (
 const defaultConfigFile = ".tribo.yaml"
 
 type TriboConfig struct {
-	BlogName string `yaml:"blogTitle"`
+	BaseUrlPath string `yaml:"baseUrlPath"`
+	BlogName    string `yaml:"blogTitle"`
 
 	OutputDir   string `yaml:"outputDir"`
 	PostsDir    string `yaml:"postsDir"`
@@ -50,6 +51,8 @@ func Init(cmdArgs []string) {
 	flags := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	configFile := flags.String("configFile", defaultConfigFile, "config file")
 
+	baseUrlPath := flags.String("baseUrlPath", "", "base blog URL path")
+
 	outputDir := flags.String("outputDir", "", "output directory")
 	postsDir := flags.String("postsDir", "", "posts directory")
 	staticDir := flags.String("staticDir", "", "static files directory")
@@ -60,6 +63,9 @@ func Init(cmdArgs []string) {
 	loadConfigFile(*configFile)
 
 	// Overwrite values in Values with those from command line if they've been given
+	if *baseUrlPath != "" {
+		Values.BaseUrlPath = *baseUrlPath
+	}
 	if *outputDir != "" {
 		Values.OutputDir = *outputDir
 	}

@@ -189,7 +189,7 @@ func (p *Post) build(outputDir string) error {
 	// Build filepath for post from publish date and linkname
 	year := p.metadata.publishDate.Format("2006")
 	month := p.metadata.publishDate.Format("01")
-	p.urlPath = strings.Join([]string{year, month, p.metadata.linkName}, "/")
+	p.urlPath = strings.Join([]string{config.Values.BaseUrlPath, year, month, p.metadata.linkName}, "/")
 	p.outputDir = filepath.Join(outputDir, year, month, p.metadata.linkName)
 
 	// Do a uniqueness check on directory name

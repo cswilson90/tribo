@@ -14,8 +14,9 @@ import (
 )
 
 type commonData struct {
-	BlogName  string
-	PageTitle string
+	BaseUrlPath string
+	BlogName    string
+	PageTitle   string
 }
 
 type postData struct {
@@ -124,7 +125,8 @@ func postToPostData(post *Post) (postData, error) {
 
 func comData() commonData {
 	return commonData{
-		BlogName:  config.Values.BlogName,
-		PageTitle: config.Values.BlogName,
+		BaseUrlPath: config.Values.BaseUrlPath,
+		BlogName:    config.Values.BlogName,
+		PageTitle:   config.Values.BlogName,
 	}
 }
