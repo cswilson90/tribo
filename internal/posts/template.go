@@ -23,11 +23,13 @@ type postData struct {
 	Title   string
 	Content template.HTML
 	Url     string
+	Tags    []string
 }
 
 type postListPageData struct {
-	Common commonData
-	Posts  []postData
+	Common  commonData
+	Posts   []postData
+	AllTags []string
 }
 
 type postPageData struct {
@@ -78,12 +80,24 @@ func postListHTML(posts Posts, outputFilename string) error {
 		Posts:  make([]postData, len(posts)),
 	}
 
+	uniqueTags := make(map[string]struct{})
 	for i, post := range posts {
 		var err error
 		tmplData.Posts[i], err = postToPostData(post)
 		if err != nil {
 			return err
 		}
+
+		for _, tag := range tmplData.Posts[i].Tags {
+			uniqueTags[tag] = struct{}{}
+		}
+	}
+
+	tmplData.AllTags = make([]string, len(uniqueTags))
+	i := 0
+	for tag := range uniqueTags {
+		tmplData.AllTags[i] = tag
+		i++
 	}
 
 	return renderTemplate("post_list.html.tmpl", outputFilename, tmplData)
@@ -120,6 +134,7 @@ func postToPostData(post *Post) (postData, error) {
 		Title:   post.metadata.title,
 		Content: template.HTML(postHTML),
 		Url:     post.urlPath,
+		Tags:    post.metadata.tags,
 	}, nil
 }
 

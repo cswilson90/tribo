@@ -30,3 +30,13 @@ body {
     margin: auto;
     max-width: 42em;
 }
+
+ul.tag-list {
+    display: inline;
+    padding: 0;
+}
+
+ul.tag-list li {
+    display: inline;
+    text-decoration: underline;
+}
