@@ -2,13 +2,15 @@
 
 <h1>All Blog Posts</h1>
 <div id="post-list">
-    <ul>
+    Find Post: <input type="text" class="search" />
+    <ul class="list">
     {{range .Posts}}
         <li>
-            <a href="{{.Url}}">{{.Title}}</a>
+            <a class="title" href="{{.Url}}">{{.Title}}</a>
         </li>
     {{end}}
     </ul>
+    <ul class="pagination"></ul>
 </div>
 
 {{template "footer.html.tmpl"}}
