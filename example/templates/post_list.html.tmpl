@@ -2,13 +2,26 @@
 
 <h1>All Blog Posts</h1>
 <div id="post-list">
-    Find Post: <input type="text" class="search" />
+    Filter by Tag:
+    <ul class="tag-list tag-search">
+    {{- range .AllTags}}
+        <li>{{.}}</li>
+    {{ end -}}
+    </ul>
+
     <ul class="list">
-    {{range .Posts}}
-        <li>
-            <a class="title" href="{{.Url}}">{{.Title}}</a>
+    {{- range $post_id, $post := .Posts }}
+        <li data-id="{{$post_id}}">
+            <div class="post-preview">
+                <h2 class="post-title"><a href="{{$post.Url}}">{{$post.Title}}</a></h2>
+                <ul class="tag-list">
+                {{- range $post.Tags }}
+                    <li>{{.}}</li>
+                {{ end -}}
+                </ul>
+            </div>
         </li>
-    {{end}}
+    {{ end -}}
     </ul>
     <ul class="pagination"></ul>
 </div>

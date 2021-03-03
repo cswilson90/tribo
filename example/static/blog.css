@@ -40,3 +40,22 @@ ul.tag-list li {
     display: inline;
     text-decoration: underline;
 }
+
+.post-preview ul.tag-list {
+    display: block;
+}
+
+#post-list .list {
+    list-style: none;
+    padding: 0;
+}
+
+#post-list .post-title {
+    font-size: 26;
+    margin: 1 0;
+}
+
+#post-list .pagination {
+    list-style: none;
+    padding: 0;
+}

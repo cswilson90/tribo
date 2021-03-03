@@ -41,3 +41,7 @@ You can use any webserver. You just need to configure it to serve static files o
 
 You can then view the example blog by visiting `http://127.0.0.1/` in a browser on the machine
 running the webserver.
+
+## References
+
+The example given makes use of [list.js](https://listjs.com/).
