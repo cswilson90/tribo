@@ -1,8 +1,8 @@
 {{template "header.html.tmpl" .}}
 
 <h1>{{.Post.Title}}</h1>
-Tags:
-<ul class="tag-list">
+{{.Post.PublishDate}}
+- <ul class="tag-list">
 {{range .Post.Tags}}
   <li>{{.}}</li>
 {{end}}

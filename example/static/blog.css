@@ -41,10 +41,6 @@ ul.tag-list li {
     text-decoration: underline;
 }
 
-.post-preview ul.tag-list {
-    display: block;
-}
-
 #post-list .list {
     list-style: none;
     padding: 0;

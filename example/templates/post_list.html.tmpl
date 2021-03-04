@@ -14,7 +14,7 @@
         <li data-id="{{$post_id}}">
             <div class="post-preview">
                 <h2 class="post-title"><a href="{{$post.Url}}">{{$post.Title}}</a></h2>
-                <ul class="tag-list">
+                {{$post.PublishDate}} - <ul class="tag-list">
                 {{- range $post.Tags }}
                     <li>{{.}}</li>
                 {{ end -}}

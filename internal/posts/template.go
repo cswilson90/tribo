@@ -20,10 +20,11 @@ type commonData struct {
 }
 
 type postData struct {
-	Title   string
-	Content template.HTML
-	Url     string
-	Tags    []string
+	Title       string
+	Content     template.HTML
+	PublishDate string
+	Url         string
+	Tags        []string
 }
 
 type postListPageData struct {
@@ -131,10 +132,11 @@ func postToPostData(post *Post) (postData, error) {
 	postHTML := markdown.ToHTML(mdContent, nil, nil)
 
 	return postData{
-		Title:   post.metadata.title,
-		Content: template.HTML(postHTML),
-		Url:     post.urlPath,
-		Tags:    post.metadata.tags,
+		Title:       post.metadata.title,
+		Content:     template.HTML(postHTML),
+		PublishDate: post.metadata.publishDate.Format("2 Jan 2006"),
+		Url:         post.urlPath,
+		Tags:        post.metadata.tags,
 	}, nil
 }
 
