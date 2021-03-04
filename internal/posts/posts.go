@@ -34,6 +34,13 @@ type Post struct {
 	metadata *PostMetadata
 }
 
+// Functions to sort a list of posts by publish date with newest first
+func (p Posts) Len() int      { return len(p) }
+func (p Posts) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
+func (p Posts) Less(i, j int) bool {
+	return p[i].metadata.publishDate.After(p[j].metadata.publishDate)
+}
+
 // BuildPosts finds all the posts in a directory and builds them.
 // The provided directory is converted to an absolute directory before use.
 func BuildPosts(inputDir, outputDir string) {

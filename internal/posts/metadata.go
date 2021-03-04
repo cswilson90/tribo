@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 
@@ -126,6 +127,9 @@ func processRawMetadata(rawData *rawPostMetadata) (*PostMetadata, error) {
 	// to dashes and lowercase
 	rawData.LinkName = linkNameDangerous.ReplaceAllString(rawData.LinkName, "")
 	rawData.LinkName = strings.ToLower(strings.ReplaceAll(rawData.LinkName, " ", "-"))
+
+	// Sort tags
+	sort.Strings(rawData.Tags)
 
 	return &PostMetadata{
 		linkName:    rawData.LinkName,

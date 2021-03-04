@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"github.com/gomarkdown/markdown"
 	log "github.com/sirupsen/logrus"
@@ -76,6 +77,8 @@ func postToHTML(post *Post, outputFilename string) error {
 }
 
 func postListHTML(posts Posts, outputFilename string) error {
+	sort.Sort(posts)
+
 	tmplData := postListPageData{
 		Common: comData(),
 		Posts:  make([]postData, len(posts)),
@@ -100,6 +103,7 @@ func postListHTML(posts Posts, outputFilename string) error {
 		tmplData.AllTags[i] = tag
 		i++
 	}
+	sort.Strings(tmplData.AllTags)
 
 	return renderTemplate("post_list.html.tmpl", outputFilename, tmplData)
 }
