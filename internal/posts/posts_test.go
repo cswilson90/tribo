@@ -62,4 +62,12 @@ func TestBuildPosts(t *testing.T) {
 			t.Errorf("Expected html file '%v' doesn't exist", mainIndex)
 		}
 	}
+
+	expectedResourceFiles := []string{"2020/12/post-2-202012/static.file"}
+	for _, file := range expectedResourceFiles {
+		resourceFile := filepath.Join(tmpDir, file)
+		if _, err := os.Stat(resourceFile); os.IsNotExist(err) {
+			t.Errorf("Expected resource file '%v' doesn't exist", resourceFile)
+		}
+	}
 }

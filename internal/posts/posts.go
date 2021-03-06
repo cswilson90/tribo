@@ -29,6 +29,7 @@ type Post struct {
 	dir         string
 	outputDir   string
 	contentFile string
+	resourceDir string
 
 	urlPath  string
 	metadata *PostMetadata
@@ -161,12 +162,17 @@ func newPost(dir string) (*Post, error) {
 
 	// If the directory contains a metadata file and a content file it's a post directory
 	metadata, content := false, ""
+	resourceDir := ""
 	for _, file := range fileList {
 		if isMetadataFile(file.Name()) {
 			metadata = true
 		}
 		if file.Name() == "content.md" {
 			content = filepath.Join(dir, file.Name())
+		}
+
+		if file.Name() == "resources" && file.IsDir() {
+			resourceDir = filepath.Join(dir, file.Name())
 		}
 	}
 
@@ -182,6 +188,7 @@ func newPost(dir string) (*Post, error) {
 	return &Post{
 		dir:         dir,
 		contentFile: content,
+		resourceDir: resourceDir,
 	}, nil
 }
 
@@ -212,6 +219,15 @@ func (p *Post) build(outputDir string) error {
 	err = os.MkdirAll(p.outputDir, 0775)
 	if err != nil {
 		return err
+	}
+
+	// Copy static resources to output file if the post has some
+	if p.resourceDir != "" {
+		log.Debugf("Copying post resources from '%v'", p.resourceDir)
+		err = copy.Copy(p.resourceDir, p.outputDir)
+		if err != nil {
+			log.Errorf("Failed to copy resource files from '%v' to '%v':"+err.Error(), p.resourceDir, p.outputDir)
+		}
 	}
 
 	// Generate HTML of post from markdown and templates
