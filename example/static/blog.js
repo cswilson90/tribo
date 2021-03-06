@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", function() {
             pagination: true
         });
 
+        tagClear = document.getElementById('tag-search-clear');
+
         // Add an onclick handler to filter by tag
         const tagSearches = document.querySelectorAll('.tag-search');
         tagSearches.forEach(function (tagList) {
@@ -17,11 +19,24 @@ document.addEventListener("DOMContentLoaded", function() {
             for (let tagElement of tagElements) {
                 tagElement.addEventListener('click', function () {
                     filterToTag(tagElement.innerHTML, blogList);
+                    for (let otherTagElement of tagElements) {
+                        otherTagElement.classList.remove('active');
+                    }
+                    tagElement.classList.add('active');
+                    if (tagClear) {
+                        tagClear.classList.remove('hidden');
+                    }
                 }, false);
             }
         });
-    }
 
+        if (tagClear) {
+            tagClear.addEventListener('click', function () {
+                filterToTag('', blogList);
+                tagClear.classList.add('hidden');
+            }, false);
+        }
+    }
 });
 
 function filterToTag(tagName, blogList) {

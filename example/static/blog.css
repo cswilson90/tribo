@@ -7,6 +7,10 @@ body {
     background-color: #012A4A;
 }
 
+.hidden {
+    display: none;
+}
+
 #blog-content {
     background-color: white;
     padding: 1em;
@@ -41,9 +45,23 @@ ul.tag-list li {
     text-decoration: underline;
 }
 
+ul.tag-search li.active {
+    border-style: dotted;
+    border-width: 1px;
+}
+
+.clickable {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 #post-list .list {
     list-style: none;
     padding: 0;
+}
+
+#post-list .list li {
+    margin-bottom: 1em;
 }
 
 #post-list .post-title {

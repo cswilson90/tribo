@@ -5,9 +5,10 @@
     Filter by Tag:
     <ul class="tag-list tag-search">
     {{- range .AllTags}}
-        <li>{{.}}</li>
+        <li class="clickable">{{.}}</li>
     {{ end -}}
     </ul>
+    <span id="tag-search-clear" class="hidden">- <span class="clickable">Clear</span></span>
 
     <ul class="list">
     {{- range $post_id, $post := .Posts }}
