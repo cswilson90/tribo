@@ -27,6 +27,7 @@ func TestFindPosts(t *testing.T) {
 }
 
 func TestBuildPosts(t *testing.T) {
+	config.Init([]string{})
 	log.SetLevel(log.FatalLevel)
 	config.Values.StaticDir = staticDir
 	config.Values.TemplateDir = templateDir

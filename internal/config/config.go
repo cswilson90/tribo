@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -20,6 +21,8 @@ type TriboConfig struct {
 	PostsDir    string `yaml:"postsDir"`
 	StaticDir   string `yaml:"staticDir"`
 	TemplateDir string `yaml:"templateDir"`
+
+	Parallelism int `yaml:"parallelism"`
 }
 
 var (
@@ -34,6 +37,8 @@ var (
 		PostsDir:    "posts",
 		StaticDir:   "static",
 		TemplateDir: "templates",
+
+		Parallelism: runtime.NumCPU(),
 	}
 )
 
@@ -57,6 +62,8 @@ func Init(cmdArgs []string) {
 	postsDir := flags.String("postsDir", "", "posts directory")
 	staticDir := flags.String("staticDir", "", "static files directory")
 	templateDir := flags.String("templateDir", "", "template directory")
+
+	parallelism := flags.Int("parallelism", 0, "max parallelism")
 	flags.Parse(cmdArgs)
 
 	// Load values from config file into Values
@@ -77,6 +84,9 @@ func Init(cmdArgs []string) {
 	}
 	if *templateDir != "" {
 		Values.TemplateDir = *templateDir
+	}
+	if *parallelism != 0 {
+		Values.Parallelism = *parallelism
 	}
 
 	// Convert file/path arguments into absolute paths

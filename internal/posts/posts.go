@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"sync"
 
@@ -62,8 +61,7 @@ func BuildPosts(inputDir, outputDir string) {
 	posts := findPosts(absInputDir)
 
 	// Build posts in parallel
-	// TODO make number of workers configurable
-	numWorkers := runtime.NumCPU()
+	numWorkers := config.Values.Parallelism
 	if numWorkers > len(posts) {
 		numWorkers = len(posts)
 	}

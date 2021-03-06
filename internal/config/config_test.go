@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,16 +20,22 @@ var tests = []struct {
 			PostsDir:    "posts",
 			StaticDir:   "static",
 			TemplateDir: "templates",
+			Parallelism: runtime.NumCPU(),
 		},
 	},
 	{
-		flags: []string{"-outputDir", "/home/test/output", "-postsDir", "other/posts"},
+		flags: []string{
+			"-outputDir", "/home/test/output",
+			"-postsDir", "other/posts",
+			"-parallelism", "8",
+		},
 		expectedValues: TriboConfig{
 			BlogName:    "My Blog",
 			OutputDir:   "/home/test/output",
 			PostsDir:    "other/posts",
 			StaticDir:   "static",
 			TemplateDir: "templates",
+			Parallelism: 8,
 		},
 	},
 	{
@@ -39,6 +46,7 @@ var tests = []struct {
 			PostsDir:    "posts",
 			StaticDir:   "static",
 			TemplateDir: "other/templates",
+			Parallelism: runtime.NumCPU(),
 		},
 	},
 }
