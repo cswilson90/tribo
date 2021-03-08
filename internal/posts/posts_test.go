@@ -16,9 +16,6 @@ const inputDir = "testdata/posts"
 const staticDir = "testdata/static"
 const templateDir = "testdata/templates"
 
-// TODO when output is produced
-// * Add test for duplicate checking
-
 func TestFindPosts(t *testing.T) {
 	log.SetLevel(log.FatalLevel)
 
