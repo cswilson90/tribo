@@ -102,15 +102,13 @@ func processRawMetadata(rawData *rawPostMetadata) (*PostMetadata, error) {
 		return nil, fmt.Errorf("No title given for post")
 	}
 
-	// Default publish time to today if not given
-	publishTime := time.Now()
+	if rawData.PublishDate == "" {
+		return nil, fmt.Errorf("No publish date given for post")
+	}
 
-	var err error
-	if rawData.PublishDate != "" {
-		publishTime, err = time.Parse(dateFormat, rawData.PublishDate)
-		if err != nil {
-			return nil, fmt.Errorf("Could not parse publish date '%v': "+err.Error(), rawData.PublishDate)
-		}
+	publishTime, err := time.Parse(dateFormat, rawData.PublishDate)
+	if err != nil {
+		return nil, fmt.Errorf("Could not parse publish date '%v': "+err.Error(), rawData.PublishDate)
 	}
 
 	// If no link name has been given make one from the title

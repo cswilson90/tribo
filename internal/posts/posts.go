@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/otiai10/copy"
 	log "github.com/sirupsen/logrus"
@@ -32,6 +33,8 @@ type Post struct {
 
 	urlPath  string
 	metadata *PostMetadata
+
+	published bool
 }
 
 // Functions to sort a list of posts by publish date with newest first
@@ -87,9 +90,17 @@ func BuildPosts(inputDir, outputDir string) {
 		log.Fatalf("Failed to copy static files from '%v' to '%v':"+err.Error(), config.Values.StaticDir, absOutputDir)
 	}
 
+	// Filter out unpublished posts
+	publishedPosts := make(Posts, 0)
+	for _, post := range posts {
+		if post.published {
+			publishedPosts = append(publishedPosts, post)
+		}
+	}
+
 	// Output list of posts HTML
 	indexFile := filepath.Join(absOutputDir, "index.html")
-	postListHTML(posts, indexFile)
+	postListHTML(publishedPosts, indexFile)
 }
 
 // buildPosts gets posts from a channel and builds them.
@@ -198,6 +209,11 @@ func (p *Post) build(outputDir string) error {
 		return err
 	}
 
+	// Check if post should be published yet
+	if p.metadata.publishDate.After(time.Now()) {
+		return nil
+	}
+
 	// Build filepath for post from publish date and linkname
 	year := p.metadata.publishDate.Format("2006")
 	month := p.metadata.publishDate.Format("01")
@@ -235,5 +251,6 @@ func (p *Post) build(outputDir string) error {
 		return err
 	}
 
+	p.published = true
 	return nil
 }

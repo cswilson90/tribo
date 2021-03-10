@@ -3,13 +3,10 @@ package posts
 import (
 	"fmt"
 	"testing"
-	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
-
-var today = time.Now().Format(dateFormat)
 
 var tests = []struct {
 	dir      string
@@ -29,7 +26,7 @@ var tests = []struct {
 		dir:      "testdata/posts/2021/01/post2/",
 		title:    "2021 01 Post 2",
 		linkName: "post2-2021-01",
-		date:     today,
+		date:     "2021-01-01",
 		tags:     []string{"jolly"},
 	},
 	{

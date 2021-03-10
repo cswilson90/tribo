@@ -4,7 +4,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -32,12 +31,9 @@ func TestBuildPosts(t *testing.T) {
 	tmpDir := t.TempDir()
 	BuildPosts(inputDir, tmpDir)
 
-	today := time.Now()
-	todayDir := filepath.Join(today.Format("2006"), today.Format("01"))
-
 	expectedDirs := []string{
 		"2021/01/2021-01-post-1/",
-		filepath.Join(todayDir, "post2-2021-01/"),
+		"2021/01/post2-2021-01/",
 		"2020/12/post-2-202012/",
 	}
 

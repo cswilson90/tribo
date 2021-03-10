@@ -28,12 +28,14 @@ type postData struct {
 	Tags        []string
 }
 
+// Passed to post_list.html.tmpl
 type postListPageData struct {
 	Common  commonData
 	Posts   []postData
 	AllTags []string
 }
 
+// Passed to post.html.tmpl
 type postPageData struct {
 	Common commonData
 	Post   postData
