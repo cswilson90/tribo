@@ -20,7 +20,7 @@ To quickly get the example blog running run the following commands:
 ```
 $ git clone https://github.com/cswilson90/tribo.git
 $ cd tribo/example
-$ tribo -outputDir /srv/blog
+$ tribo
 ```
 
 This will build the example blog and install it in `/srv/blog`.
@@ -110,8 +110,8 @@ title. In the example the post at `posts/2021/01/` is available at
 A post directory can contain the following:
 
 * `content.md` (required) - a markdown file containing the content of the blog post.
-* `metadata.yaml` (required) - a YAML file containing metadata for the the blog post, see the
-  [post metadata section](#post-metadata) for information on the data that can be provided.
+* `metadata.[yaml|json]` (required) - a YAML or JSON file containing metadata for the the blog post,
+  see the [post metadata section](#post-metadata) for information on the data that can be provided.
 * `resources/` (optional) - a directory containing static resources used in the post e.g. images.
   These will be copied to the root of the output blog post directory e.g. in the example
   `image-post` uses an image at `http://127.0.0.1/2021/03/a-post-with-an-image/cat.jpg`. This is
@@ -127,7 +127,9 @@ at e.g. `http://127.0.0.1/blog.js` for `blog.js` in the example
 
 ### Template Files
 
-`templates/`
+`templates/` is where you should put templates for generating the static pages. See the
+[writing your own templates](#writing-your-own-templates) section for more information about
+customising the templates.
 
 ### Config File
 
@@ -146,7 +148,28 @@ blogName:  "My Blog"
 
 ## Post Metadata
 
+The metadata for a post should be given in a file called `metadata.yaml` or `metadata.json`
+in the post's directory.
 
+The following options can be given:
+
+| Option      | Required | Description                                                                                                        |
+|-------------|----------|--------------------------------------------------------------------------------------------------------------------|
+| title       | Yes      | The title of the blog post                                                                                         |
+| publishdate | Yes      | The date of publishing of the post. This is used to generate the link for the post. Should be in `YYYY-MM-DD` format. |
+| tags        | No       | A list of tags to attach to the blog post.                                                                         |
+| linkname    | No       | The name used as the last part of the link to the post. If not given a name will be generated from the post title. |
+
+An example of the contents of a metadata YAML file:
+
+```
+---
+title: "My first blog post"
+publishdate: "2021-03-10"
+tags:
+  - fun
+  - aboutme
+```
 
 ## Program Configuration
 
@@ -170,6 +193,50 @@ The following can be configured:
 | staticDir   | static         | The directory where static resources for the entire blog are saved. The contents of the directory is copied into the output directory to be served by the server. Default is `static/` in the working directory. |
 | templateDir | templates      | The directory which stores the templates used to generate the pages of the blog. Default is `templates/` in the working directory.                                                                               |
 | parallelism | Number of CPUs | The max number of blog posts generated in parallel at the same time. Defaults to the number of CPUs available on the machine.                                                                                    |
+
+## Writing Your Own Templates
+
+Templates use golang's `html/template` [package](https://golang.org/pkg/html/template/).
+
+There are two main template files in the templates directory:
+
+* `post.html.tmpl` - used to generate the page for a single post
+* `post_list.html.tmpl` - used to generate the list of posts that is used as the main page of
+the blog
+
+The template folder also contains a `includes/` directory in which you can put templates which
+are included in the two main files. In the example this is just the header and footer but more
+can be added if required.
+
+A postPageData object is passed in as the input to `post.html.tmpl` and a postListPageData object
+is passed to `post_list.html.tmpl`. The structure of the objects is as follows:
+
+```
+postPageData {
+    Common: commonData, // Data common to all pages
+    Post:   postData,   // Data for the post to be displayed on the page
+}
+
+postListPageData {
+    Common:  commonData,   // Data common to all pages
+    Posts:   [ postData ], // A list of data for each post in the list (sorted by publish date)
+    AllTags: [ string ],   // A list of all tags from all posts (ordered alphabetically)
+}
+
+commonData {
+    BaseURLPath: string, // The base path of the blog on the server
+    BlogName:    string, // The global name of the blog
+    PageTitle:   string, // A title for the page to be used as the HTML title
+}
+
+postData {
+    Title:       string,        // The title of the blog post
+    Content:     template.HTML, // The HTML content of the post (in a format compatible with the `html/template` package)
+    PublishDate: string         // The publish date of the blog post in "01 Jan 2000" format
+    Url:         string         // The direct URL link for the post
+    Tags:        [ string ]     // A list of tags attached to the post
+}
+```
 
 ## References
 
