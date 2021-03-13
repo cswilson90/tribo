@@ -210,7 +210,8 @@ func (p *Post) build(outputDir string) error {
 	}
 
 	// Check if post should be published yet
-	if p.metadata.publishDate.After(time.Now()) {
+	// Publish all posts of futurePosts config option has been set
+	if !config.Values.FuturePosts && p.metadata.publishDate.After(time.Now()) {
 		return nil
 	}
 

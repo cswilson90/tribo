@@ -156,7 +156,7 @@ The following options can be given:
 | Option      | Required | Description                                                                                                        |
 |-------------|----------|--------------------------------------------------------------------------------------------------------------------|
 | title       | Yes      | The title of the blog post                                                                                         |
-| publishdate | Yes      | The date of publishing of the post. This is used to generate the link for the post. Should be in `YYYY-MM-DD` format. |
+| publishdate | Yes      | The date of publishing of the post. This is used to generate the link for the post. Should be in `YYYY-MM-DD` format. Posts with a publish date in the future won't be added to the output. |
 | tags        | No       | A list of tags to attach to the blog post.                                                                         |
 | linkname    | No       | The name used as the last part of the link to the post. If not given a name will be generated from the post title. |
 
@@ -188,11 +188,12 @@ The following can be configured:
 |-------------|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | baseURLPath |                | The base URL path of the blog if it isn't the root of the site e.g. if you wanted your blog at `http://127.0.0.1/blog/` you should set this to `/blog`                                                         |
 | blogName    | My Blog        | The name of the blog. This is passed to the templates when generating the site.                                                                                                                                  |
-| outputDir   | blog           | The directory to output the static blog files to. Default is `blog/` in the working directory.                                                                                                                   |
-| postsDir    | posts          | The directory where the raw content of the blog posts are saved. Default is `posts/` in the working directory.                                                                                                   |
-| staticDir   | static         | The directory where static resources for the entire blog are saved. The contents of the directory is copied into the output directory to be served by the server. Default is `static/` in the working directory. |
-| templateDir | templates      | The directory which stores the templates used to generate the pages of the blog. Default is `templates/` in the working directory.                                                                               |
+| outputDir   | `blog`         | The directory to output the static blog files to. Default is `blog/` in the working directory.                                                                                                                   |
+| postsDir    | `posts`        | The directory where the raw content of the blog posts are saved. Default is `posts/` in the working directory.                                                                                                   |
+| staticDir   | `static`       | The directory where static resources for the entire blog are saved. The contents of the directory is copied into the output directory to be served by the server. Default is `static/` in the working directory. |
+| templateDir | `templates`    | The directory which stores the templates used to generate the pages of the blog. Default is `templates/` in the working directory.                                                                               |
 | parallelism | Number of CPUs | The max number of blog posts generated in parallel at the same time. Defaults to the number of CPUs available on the machine.                                                                                    |
+| futurePosts | `false`        | Whether to publish posts with a publish date in the future. Values in YAML should be `true`/`false`, the flag can be given with no arguments on the command line to enable.                                      |
 
 ## Writing Your Own Templates
 

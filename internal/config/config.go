@@ -22,7 +22,8 @@ type TriboConfig struct {
 	StaticDir   string `yaml:"staticDir"`
 	TemplateDir string `yaml:"templateDir"`
 
-	Parallelism int `yaml:"parallelism"`
+	Parallelism int  `yaml:"parallelism"`
+	FuturePosts bool `yaml:"futurePosts"`
 }
 
 var (
@@ -39,6 +40,7 @@ var (
 		TemplateDir: "templates",
 
 		Parallelism: runtime.NumCPU(),
+		FuturePosts: false,
 	}
 )
 
@@ -64,6 +66,7 @@ func Init(cmdArgs []string) {
 	templateDir := flags.String("templateDir", "", "template directory")
 
 	parallelism := flags.Int("parallelism", 0, "max parallelism")
+	futurePosts := flags.Bool("futurePosts", false, "publish future posts")
 	flags.Parse(cmdArgs)
 
 	// Load values from config file into Values
@@ -87,6 +90,9 @@ func Init(cmdArgs []string) {
 	}
 	if *parallelism != 0 {
 		Values.Parallelism = *parallelism
+	}
+	if *futurePosts && !Values.FuturePosts {
+		Values.FuturePosts = *futurePosts
 	}
 
 	// Convert file/path arguments into absolute paths

@@ -1,3 +1,4 @@
 ---
 outputDir: test/config/output
 templateDir: other/templates
+futurePosts: true
