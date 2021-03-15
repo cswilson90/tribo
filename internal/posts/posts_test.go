@@ -49,7 +49,7 @@ func TestBuildPosts(t *testing.T) {
 		}
 	}
 
-	expectedRootFiles := []string{"index.html", "test.css"}
+	expectedRootFiles := []string{"index.html", "test.css", "rss.xml"}
 	for _, file := range expectedRootFiles {
 		mainIndex := filepath.Join(tmpDir, file)
 		if _, err := os.Stat(mainIndex); os.IsNotExist(err) {

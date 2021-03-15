@@ -78,9 +78,8 @@ func postToHTML(post *Post, outputFilename string) error {
 	return renderTemplate("post.html.tmpl", outputFilename, tmplData)
 }
 
+// postListHTML generates the HTML for the list of posts used as the main page for the blog.
 func postListHTML(posts Posts, outputFilename string) error {
-	sort.Sort(posts)
-
 	tmplData := postListPageData{
 		Common: comData(),
 		Posts:  make([]postData, len(posts)),

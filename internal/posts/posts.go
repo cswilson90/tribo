@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -98,9 +99,15 @@ func BuildPosts(inputDir, outputDir string) {
 		}
 	}
 
+	sort.Sort(publishedPosts)
+
 	// Output list of posts HTML
 	indexFile := filepath.Join(absOutputDir, "index.html")
 	postListHTML(publishedPosts, indexFile)
+
+	// Output RSS feed of posts
+	rssFile := filepath.Join(absOutputDir, "rss.xml")
+	postRSSFeed(publishedPosts, rssFile)
 }
 
 // buildPosts gets posts from a channel and builds them.
