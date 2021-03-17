@@ -16,6 +16,7 @@ var tests = []struct {
 		flags: []string{},
 		expectedValues: TriboConfig{
 			BlogName:    "My Blog",
+			RssLinkUrl:  "http://127.0.0.1",
 			OutputDir:   "blog",
 			PostsDir:    "posts",
 			StaticDir:   "static",
@@ -30,9 +31,11 @@ var tests = []struct {
 			"-postsDir", "other/posts",
 			"-parallelism", "8",
 			"-futurePosts",
+			"-rssLinkUrl", "https://example.com",
 		},
 		expectedValues: TriboConfig{
 			BlogName:    "My Blog",
+			RssLinkUrl:  "https://example.com",
 			OutputDir:   "/home/test/output",
 			PostsDir:    "other/posts",
 			StaticDir:   "static",
@@ -45,6 +48,7 @@ var tests = []struct {
 		flags: []string{"-configFile", "testdata/test_config.yaml", "-outputDir", "/home/test/output"},
 		expectedValues: TriboConfig{
 			BlogName:    "My Blog",
+			RssLinkUrl:  "http://127.0.0.1",
 			OutputDir:   "/home/test/output",
 			PostsDir:    "posts",
 			StaticDir:   "static",

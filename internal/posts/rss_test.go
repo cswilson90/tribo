@@ -16,11 +16,13 @@ import (
 const (
 	blogName    = "Test Blog"
 	baseUrlPath = "/blog"
+	rssLinkUrl  = "https://test.invalid"
 )
 
 func TestRSS(t *testing.T) {
 	config.Values.BlogName = blogName
 	config.Values.BaseUrlPath = baseUrlPath
+	config.Values.RssLinkUrl = rssLinkUrl
 
 	posts := Posts{
 		&Post{
@@ -72,7 +74,7 @@ func TestRSS(t *testing.T) {
 
 	channel := rssXML.Channel
 	assert.Equal(blogName, channel.Title, "Incorrect RSS channel title")
-	assert.Equal(baseUrlPath, channel.Link, "Incorrect RSS channel Link")
+	assert.Equal(rssLinkUrl+baseUrlPath, channel.Link, "Incorrect RSS channel Link")
 	assert.Equal(blogName, channel.Description, "Incorrect RSS channel description")
 	assert.Equal(posts[0].metadata.publishDate.Format(RSSDateFormat), channel.LastBuildDate, "Incorrect RSS channel build date")
 	assert.Equal(1800, channel.TTL, "Incorrect RSS channel TTL")
@@ -84,9 +86,9 @@ func TestRSS(t *testing.T) {
 
 	for i, item := range items {
 		assert.Equal(posts[i].metadata.title, item.Title, "Incorrect title for post %v", i)
-		assert.Equal(posts[i].urlPath, item.Link, "Incorrect link for post %v", i)
+		assert.Equal(rssLinkUrl+posts[i].urlPath, item.Link, "Incorrect link for post %v", i)
 		assert.Equal("", item.Description, "Incorrect description for post %v", i)
-		assert.Equal(posts[i].urlPath, item.Guid, "Incorrect guid for post %v", i)
+		assert.Equal(rssLinkUrl+posts[i].urlPath, item.Guid, "Incorrect guid for post %v", i)
 		assert.Equal(posts[i].metadata.publishDate.Format(RSSDateFormat), item.PubDate, "Incorrect pubdate for post %v", i)
 	}
 }

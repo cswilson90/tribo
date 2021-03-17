@@ -53,11 +53,14 @@ func postRSSFeed(posts Posts, outputFile string) {
 	postsXML := make([]*ItemXML, maxPosts)
 	for i := 0; i < maxPosts; i++ {
 		post := posts[i]
+
+		postLink := config.Values.RssLinkUrl + post.urlPath
+
 		postsXML[i] = &ItemXML{
 			Title:       post.metadata.title,
-			Link:        post.urlPath,
+			Link:        postLink,
 			Description: "",
-			Guid:        post.urlPath,
+			Guid:        postLink,
 			PubDate:     post.metadata.publishDate.Format(RSSDateFormat),
 		}
 	}
@@ -69,7 +72,7 @@ func postRSSFeed(posts Posts, outputFile string) {
 
 	channelXML := &ChannelXML{
 		Title:         config.Values.BlogName,
-		Link:          config.Values.BaseUrlPath,
+		Link:          config.Values.RssLinkUrl + config.Values.BaseUrlPath,
 		Description:   config.Values.BlogName,
 		LastBuildDate: lastDate.Format(RSSDateFormat),
 		PubDate:       time.Now().Format(RSSDateFormat),

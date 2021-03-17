@@ -17,6 +17,8 @@ type TriboConfig struct {
 	BaseUrlPath string `yaml:"baseUrlPath"`
 	BlogName    string `yaml:"blogTitle"`
 
+	RssLinkUrl string `yaml:"rssLinkUrl"`
+
 	OutputDir   string `yaml:"outputDir"`
 	PostsDir    string `yaml:"postsDir"`
 	StaticDir   string `yaml:"staticDir"`
@@ -33,6 +35,8 @@ var (
 	// defaultConfig defines the default values for the config.
 	defaultConfig = TriboConfig{
 		BlogName: "My Blog",
+
+		RssLinkUrl: "http://127.0.0.1",
 
 		OutputDir:   "blog",
 		PostsDir:    "posts",
@@ -60,6 +64,8 @@ func Init(cmdArgs []string) {
 
 	baseUrlPath := flags.String("baseUrlPath", "", "base blog URL path")
 
+	rssLinkUrl := flags.String("rssLinkUrl", "", "RSS link base URL")
+
 	outputDir := flags.String("outputDir", "", "output directory")
 	postsDir := flags.String("postsDir", "", "posts directory")
 	staticDir := flags.String("staticDir", "", "static files directory")
@@ -75,6 +81,9 @@ func Init(cmdArgs []string) {
 	// Overwrite values in Values with those from command line if they've been given
 	if *baseUrlPath != "" {
 		Values.BaseUrlPath = *baseUrlPath
+	}
+	if *rssLinkUrl != "" {
+		Values.RssLinkUrl = *rssLinkUrl
 	}
 	if *outputDir != "" {
 		Values.OutputDir = *outputDir
