@@ -14,20 +14,20 @@ import (
 const RSSDateFormat = "Mon, 02 Jan 2006 15:04:05 MST"
 
 type RSSXML struct {
-	XMLName xml.Name   `xml:"rss"`
-	Version string     `xml:"version,attr"`
-	Channel ChannelXML `xml:"channel"`
+	XMLName xml.Name    `xml:"rss"`
+	Version string      `xml:"version,attr"`
+	Channel *ChannelXML `xml:"channel"`
 }
 
 type ChannelXML struct {
-	XMLName       xml.Name  `xml:"channel"`
-	Title         string    `xml:"title"`
-	Link          string    `xml:"link"`
-	Description   string    `xml:"description"`
-	LastBuildDate string    `xml:"lastBuildDate"`
-	PubDate       string    `xml:"pubDate"`
-	TTL           int       `xml:"ttl"`
-	Items         []ItemXML `xml:"item"`
+	XMLName       xml.Name   `xml:"channel"`
+	Title         string     `xml:"title"`
+	Link          string     `xml:"link"`
+	Description   string     `xml:"description"`
+	LastBuildDate string     `xml:"lastBuildDate"`
+	PubDate       string     `xml:"pubDate"`
+	TTL           int        `xml:"ttl"`
+	Items         []*ItemXML `xml:"item"`
 }
 
 type ItemXML struct {
@@ -50,10 +50,10 @@ func postRSSFeed(posts Posts, outputFile string) {
 		maxPosts = len(posts)
 	}
 
-	postsXML := make([]ItemXML, maxPosts)
+	postsXML := make([]*ItemXML, maxPosts)
 	for i := 0; i < maxPosts; i++ {
 		post := posts[i]
-		postsXML[i] = ItemXML{
+		postsXML[i] = &ItemXML{
 			Title:       post.metadata.title,
 			Link:        post.urlPath,
 			Description: "",
@@ -67,7 +67,7 @@ func postRSSFeed(posts Posts, outputFile string) {
 		lastDate = posts[0].metadata.publishDate
 	}
 
-	channelXML := ChannelXML{
+	channelXML := &ChannelXML{
 		Title:         config.Values.BlogName,
 		Link:          config.Values.BaseUrlPath,
 		Description:   config.Values.BlogName,
@@ -77,7 +77,7 @@ func postRSSFeed(posts Posts, outputFile string) {
 		Items:         postsXML,
 	}
 
-	rssXML := RSSXML{
+	rssXML := &RSSXML{
 		Version: "2.0",
 		Channel: channelXML,
 	}
