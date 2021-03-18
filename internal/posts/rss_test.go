@@ -14,13 +14,15 @@ import (
 )
 
 const (
-	blogName    = "Test Blog"
-	baseUrlPath = "/blog"
-	rssLinkUrl  = "https://test.invalid"
+	blogName        = "Test Blog"
+	blogDescription = "My test blog"
+	baseUrlPath     = "/blog"
+	rssLinkUrl      = "https://test.invalid"
 )
 
 func TestRSS(t *testing.T) {
 	config.Values.BlogName = blogName
+	config.Values.BlogDescription = blogDescription
 	config.Values.BaseUrlPath = baseUrlPath
 	config.Values.RssLinkUrl = rssLinkUrl
 
@@ -75,7 +77,7 @@ func TestRSS(t *testing.T) {
 	channel := rssXML.Channel
 	assert.Equal(blogName, channel.Title, "Incorrect RSS channel title")
 	assert.Equal(rssLinkUrl+baseUrlPath, channel.Link, "Incorrect RSS channel Link")
-	assert.Equal(blogName, channel.Description, "Incorrect RSS channel description")
+	assert.Equal(blogDescription, channel.Description, "Incorrect RSS channel description")
 	assert.Equal(posts[0].metadata.publishDate.Format(RSSDateFormat), channel.LastBuildDate, "Incorrect RSS channel build date")
 	assert.Equal(1800, channel.TTL, "Incorrect RSS channel TTL")
 

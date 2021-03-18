@@ -73,7 +73,7 @@ func postRSSFeed(posts Posts, outputFile string) {
 	channelXML := &ChannelXML{
 		Title:         config.Values.BlogName,
 		Link:          config.Values.RssLinkUrl + config.Values.BaseUrlPath,
-		Description:   config.Values.BlogName,
+		Description:   config.Values.BlogDescription,
 		LastBuildDate: lastDate.Format(RSSDateFormat),
 		PubDate:       time.Now().Format(RSSDateFormat),
 		TTL:           1800,

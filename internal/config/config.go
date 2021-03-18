@@ -14,8 +14,9 @@ import (
 const defaultConfigFile = ".tribo.yaml"
 
 type TriboConfig struct {
-	BaseUrlPath string `yaml:"baseUrlPath"`
-	BlogName    string `yaml:"blogTitle"`
+	BaseUrlPath     string `yaml:"baseUrlPath"`
+	BlogName        string `yaml:"blogName"`
+	BlogDescription string `yaml:"blogDescription"`
 
 	RssLinkUrl string `yaml:"rssLinkUrl"`
 
@@ -34,7 +35,8 @@ var (
 
 	// defaultConfig defines the default values for the config.
 	defaultConfig = TriboConfig{
-		BlogName: "My Blog",
+		BlogName:        "My Blog",
+		BlogDescription: "My musings about the world",
 
 		RssLinkUrl: "http://127.0.0.1",
 
@@ -62,6 +64,8 @@ func Init(cmdArgs []string) {
 	flags := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	configFile := flags.String("configFile", defaultConfigFile, "config file")
 
+	blogName := flags.String("blogName", "", "blog name")
+	blogDescription := flags.String("blogDescription", "", "blog description")
 	baseUrlPath := flags.String("baseUrlPath", "", "base blog URL path")
 
 	rssLinkUrl := flags.String("rssLinkUrl", "", "RSS link base URL")
@@ -79,6 +83,12 @@ func Init(cmdArgs []string) {
 	loadConfigFile(*configFile)
 
 	// Overwrite values in Values with those from command line if they've been given
+	if *blogName != "" {
+		Values.BlogName = *blogName
+	}
+	if *blogDescription != "" {
+		Values.BlogDescription = *blogDescription
+	}
 	if *baseUrlPath != "" {
 		Values.BaseUrlPath = *baseUrlPath
 	}
