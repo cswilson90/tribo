@@ -13,7 +13,7 @@ body {
 
 #blog-content {
     background-color: white;
-    padding: 1em;
+    padding: 0 1em;
     min-height: 100%;
     font-family: Helvetica, Arial, sans-serif;
 }
@@ -21,13 +21,20 @@ body {
 #blog-header {
     border-bottom-style: solid;
     border-color: #61A5C2;
-    padding-bottom: 1em;
+    padding: 1em 0;
 }
 
 #blog-title {
     color: #012A4A;
     font-size: xx-large;
     text-decoration: none;
+}
+
+#blog-footer {
+    text-align: center;
+    border-top-style: solid;
+    border-color: #61A5C2;
+    padding: 1em 0;
 }
 
 .h-center {
