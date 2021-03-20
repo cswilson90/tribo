@@ -31,10 +31,31 @@ body {
 }
 
 #blog-footer {
-    text-align: center;
     border-top-style: solid;
     border-color: #61A5C2;
     padding: 1em 0;
+}
+
+#blog-banner {
+    width: 75%;
+    display: inline-block;
+}
+
+#rss-link {
+    width: 24%;
+    display: inline-block;
+    text-align: right;
+}
+
+#copyright {
+    width: 49%;
+    display: inline-block;
+}
+
+#built-with {
+    width: 49%;
+    text-align: right;
+    display: inline-block;
 }
 
 .h-center {
