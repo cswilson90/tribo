@@ -20,6 +20,10 @@
                     <li>{{.}}</li>
                 {{ end -}}
                 </ul>
+                <div class="post-preview-content">
+                {{$post.Content}}
+                <a href="{{$post.Url}}">[Read More]</a></h2>
+                </div>
             </div>
         </li>
     {{ end -}}

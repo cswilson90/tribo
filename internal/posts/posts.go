@@ -3,6 +3,7 @@ package posts
 import (
 	"container/list"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,6 +12,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/ast"
+	"github.com/gomarkdown/markdown/html"
 	"github.com/otiai10/copy"
 	log "github.com/sirupsen/logrus"
 
@@ -36,6 +40,15 @@ type Post struct {
 	metadata *PostMetadata
 
 	published bool
+}
+
+// postRenderer renders a post in HTML, supports rendering previews.
+// Implements markdown.Rendere
+type postRenderer struct {
+	htmlRenderer *html.Renderer
+	preview      bool
+
+	rendering bool
 }
 
 // Functions to sort a list of posts by publish date with newest first
@@ -261,4 +274,63 @@ func (p *Post) build(outputDir string) error {
 
 	p.published = true
 	return nil
+}
+
+// htmlContent returns the content of the post in HTML.
+// If getting a preview only returns the content for the first paragraph and
+// any headings above the first paragraph if they exist.
+func (p *Post) htmlContent(preview bool) ([]byte, error) {
+	mdContent, err := ioutil.ReadFile(p.contentFile)
+	if err != nil {
+		return nil, err
+	}
+
+	opts := html.RendererOptions{Flags: html.CommonFlags}
+	renderer := &postRenderer{
+		htmlRenderer: html.NewRenderer(opts),
+		preview:      preview,
+	}
+
+	return markdown.ToHTML(mdContent, nil, renderer), nil
+}
+
+// markdown.Renderer.RenderNode() implementation
+func (r *postRenderer) RenderNode(w io.Writer, node ast.Node, entering bool) ast.WalkStatus {
+	// Handle rendering a preview
+	// Shows only first paragraph and any headings before it
+	if r.preview {
+		switch node.(type) {
+		case *ast.Paragraph:
+			if entering {
+				// Entering a paragraph so start rendering
+				r.rendering = true
+			} else {
+				// Leaving a paragraph so we've done the preview so render the end of the
+				// paragraph and terminate
+				r.htmlRenderer.RenderNode(w, node, entering)
+				r.rendering = false
+				return ast.Terminate
+			}
+		case *ast.Heading:
+			// Hit a header before a paragraph so render it then disable rendering when leaving
+			r.rendering = entering
+		default:
+			if !r.rendering {
+				// If we're not rendering skip this node
+				return ast.GoToNext
+			}
+		}
+	}
+
+	return r.htmlRenderer.RenderNode(w, node, entering)
+}
+
+// markdown.Renderer.RenderHeader() implementation
+func (r *postRenderer) RenderHeader(w io.Writer, ast ast.Node) {
+	r.htmlRenderer.RenderHeader(w, ast)
+}
+
+// markdown.Renderer.RenderFooter() implementatio
+func (r *postRenderer) RenderFooter(w io.Writer, ast ast.Node) {
+	r.htmlRenderer.RenderFooter(w, ast)
 }

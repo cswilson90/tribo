@@ -3,12 +3,10 @@ package posts
 import (
 	"bufio"
 	"html/template"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
 
-	"github.com/gomarkdown/markdown"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/cswilson90/tribo/internal/config"
@@ -65,7 +63,7 @@ func initTemplates() error {
 
 // postToHTML generates a posts HTML content and writes it to an output file.
 func postToHTML(post *Post, outputFilename string) error {
-	postData, err := postToPostData(post)
+	postData, err := postToPostData(post, false)
 	if err != nil {
 		return err
 	}
@@ -89,7 +87,7 @@ func postListHTML(posts Posts, outputFilename string) error {
 	uniqueTags := make(map[string]struct{})
 	for i, post := range posts {
 		var err error
-		tmplData.Posts[i], err = postToPostData(post)
+		tmplData.Posts[i], err = postToPostData(post, true)
 		if err != nil {
 			return err
 		}
@@ -129,17 +127,15 @@ func renderTemplate(templateName, outputFilename string, tmplData interface{}) e
 	return nil
 }
 
-func postToPostData(post *Post) (postData, error) {
-	// Read markdown content and convert to HTML
-	mdContent, err := ioutil.ReadFile(post.contentFile)
+func postToPostData(post *Post, previewContent bool) (postData, error) {
+	postContent, err := post.htmlContent(previewContent)
 	if err != nil {
 		return postData{}, err
 	}
-	postHTML := markdown.ToHTML(mdContent, nil, nil)
 
 	return postData{
 		Title:       post.metadata.title,
-		Content:     template.HTML(postHTML),
+		Content:     template.HTML(postContent),
 		PublishDate: post.metadata.publishDate.Format("2 Jan 2006"),
 		Url:         post.urlPath,
 		Tags:        post.metadata.tags,
