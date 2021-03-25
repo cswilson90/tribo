@@ -31,24 +31,24 @@ func TestRSS(t *testing.T) {
 			urlPath: "/2021/03/test-post-1",
 			metadata: &PostMetadata{
 				publishDate: time.Date(2021, time.March, 17, 0, 0, 0, 0, time.UTC),
-				title:       "Test Post 1",
 			},
+			title:     "Test Post 1",
 			published: true,
 		},
 		&Post{
 			urlPath: "/2021/02/test-post-2",
 			metadata: &PostMetadata{
 				publishDate: time.Date(2021, time.February, 24, 0, 0, 0, 0, time.UTC),
-				title:       "Test Post 2",
 			},
+			title:     "Test Post 2",
 			published: true,
 		},
 		&Post{
 			urlPath: "/2021/01/test-post-3",
 			metadata: &PostMetadata{
 				publishDate: time.Date(2021, time.January, 12, 0, 0, 0, 0, time.UTC),
-				title:       "Test Post 3",
 			},
+			title:     "Test Post 3",
 			published: true,
 		},
 	}
@@ -87,7 +87,7 @@ func TestRSS(t *testing.T) {
 	}
 
 	for i, item := range items {
-		assert.Equal(posts[i].metadata.title, item.Title, "Incorrect title for post %v", i)
+		assert.Equal(posts[i].title, item.Title, "Incorrect title for post %v", i)
 		assert.Equal(rssLinkUrl+posts[i].urlPath, item.Link, "Incorrect link for post %v", i)
 		assert.Equal("", item.Description, "Incorrect description for post %v", i)
 		assert.Equal(rssLinkUrl+posts[i].urlPath, item.Guid, "Incorrect guid for post %v", i)

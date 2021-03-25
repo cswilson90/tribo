@@ -57,7 +57,7 @@ func postRSSFeed(posts Posts, outputFile string) {
 		postLink := config.Values.RssLinkUrl + post.urlPath
 
 		postsXML[i] = &ItemXML{
-			Title:       post.metadata.title,
+			Title:       post.title,
 			Link:        postLink,
 			Description: "",
 			Guid:        postLink,

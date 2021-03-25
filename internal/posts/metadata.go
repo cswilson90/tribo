@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
-	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -15,14 +14,11 @@ import (
 )
 
 const (
-	dateFormat        = "2006-01-02"
-	linkNameMaxLength = 50
+	dateFormat = "2006-01-02"
 )
 
 var (
-	// Dangerous characters that can cause problems in file names and URLs
-	linkNameDangerous = regexp.MustCompile(`[/?.:=%#\t\n]`)
-	metadataMatch     = regexp.MustCompile(`^metadata\.(json|ya?ml)$`)
+	metadataMatch = regexp.MustCompile(`^metadata\.(json|ya?ml)$`)
 )
 
 // PostMetadata stores the metadata about a post.
@@ -30,7 +26,6 @@ type PostMetadata struct {
 	linkName    string
 	publishDate time.Time
 	tags        []string
-	title       string
 }
 
 // rawPostMetaData defines the structure of metadata in the config file.
@@ -38,7 +33,6 @@ type rawPostMetadata struct {
 	LinkName    string
 	PublishDate string
 	Tags        []string
-	Title       string
 }
 
 // isMetadataFile returns true if a file is a metadata file.
@@ -98,10 +92,6 @@ func parseMetadata(dir string) (*PostMetadata, error) {
 
 // processRawMetadata converts the raw data to the right types and does validation.
 func processRawMetadata(rawData *rawPostMetadata) (*PostMetadata, error) {
-	if rawData.Title == "" {
-		return nil, fmt.Errorf("No title given for post")
-	}
-
 	if rawData.PublishDate == "" {
 		return nil, fmt.Errorf("No publish date given for post")
 	}
@@ -111,27 +101,11 @@ func processRawMetadata(rawData *rawPostMetadata) (*PostMetadata, error) {
 		return nil, fmt.Errorf("Could not parse publish date '%v': "+err.Error(), rawData.PublishDate)
 	}
 
-	// If no link name has been given make one from the title
-	if rawData.LinkName == "" {
-		linkRunes := []rune(linkNameDangerous.ReplaceAllString(rawData.Title, ""))
-		maxLength := linkNameMaxLength
-		if len(linkRunes) < maxLength {
-			maxLength = len(linkRunes)
-		}
-		rawData.LinkName = string(linkRunes[:maxLength])
-	}
-
-	// Remove potentially dangerous characters from link name, convert spaces
-	// to dashes and lowercase
-	rawData.LinkName = linkNameDangerous.ReplaceAllString(rawData.LinkName, "")
-	rawData.LinkName = strings.ToLower(strings.ReplaceAll(rawData.LinkName, " ", "-"))
-
 	// Sort tags
 	sort.Strings(rawData.Tags)
 
 	return &PostMetadata{
 		linkName:    rawData.LinkName,
-		title:       rawData.Title,
 		publishDate: publishTime,
 		tags:        rawData.Tags,
 	}, nil

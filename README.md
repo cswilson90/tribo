@@ -109,7 +109,10 @@ title. In the example the post at `posts/2021/01/` is available at
 
 A post directory can contain the following:
 
-* `content.md` (required) - a markdown file containing the content of the blog post.
+* `content.md` (required) - a markdown file containing the content of the blog post. The first thing
+  in the content file should be a heading with the title of the post. The content of the heading is
+  extracted and used as the title. The first paragraph of the content is extracted and used as a
+  preview on the posts list page.
 * `metadata.[yaml|json]` (required) - a YAML or JSON file containing metadata for the the blog post,
   see the [post metadata section](#post-metadata) for information on the data that can be provided.
 * `resources/` (optional) - a directory containing static resources used in the post e.g. images.
@@ -155,7 +158,6 @@ The following options can be given:
 
 | Option      | Required | Description                                                                                                        |
 |-------------|----------|--------------------------------------------------------------------------------------------------------------------|
-| title       | Yes      | The title of the blog post                                                                                         |
 | publishdate | Yes      | The date of publishing of the post. This is used to generate the link for the post. Should be in `YYYY-MM-DD` format. Posts with a publish date in the future won't be added to the output. |
 | tags        | No       | A list of tags to attach to the blog post.                                                                         |
 | linkname    | No       | The name used as the last part of the link to the post. If not given a name will be generated from the post title. |
@@ -164,7 +166,6 @@ An example of the contents of a metadata YAML file:
 
 ```
 ---
-title: "My first blog post"
 publishdate: "2021-03-10"
 tags:
   - fun

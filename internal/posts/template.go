@@ -22,6 +22,7 @@ type commonData struct {
 type postData struct {
 	Title       string
 	Content     template.HTML
+	Preview     template.HTML
 	PublishDate string
 	Url         string
 	Tags        []string
@@ -63,16 +64,13 @@ func initTemplates() error {
 
 // postToHTML generates a posts HTML content and writes it to an output file.
 func postToHTML(post *Post, outputFilename string) error {
-	postData, err := postToPostData(post, false)
-	if err != nil {
-		return err
-	}
+	postData := postToPostData(post, false)
 	tmplData := postPageData{
 		Common: comData(),
 		Post:   postData,
 	}
 
-	tmplData.Common.PageTitle = post.metadata.title
+	tmplData.Common.PageTitle = post.title
 
 	return renderTemplate("post.html.tmpl", outputFilename, tmplData)
 }
@@ -86,11 +84,7 @@ func postListHTML(posts Posts, outputFilename string) error {
 
 	uniqueTags := make(map[string]struct{})
 	for i, post := range posts {
-		var err error
-		tmplData.Posts[i], err = postToPostData(post, true)
-		if err != nil {
-			return err
-		}
+		tmplData.Posts[i] = postToPostData(post, true)
 
 		for _, tag := range tmplData.Posts[i].Tags {
 			uniqueTags[tag] = struct{}{}
@@ -127,19 +121,15 @@ func renderTemplate(templateName, outputFilename string, tmplData interface{}) e
 	return nil
 }
 
-func postToPostData(post *Post, previewContent bool) (postData, error) {
-	postContent, err := post.htmlContent(previewContent)
-	if err != nil {
-		return postData{}, err
-	}
-
+func postToPostData(post *Post, previewContent bool) postData {
 	return postData{
-		Title:       post.metadata.title,
-		Content:     template.HTML(postContent),
+		Title:       post.title,
+		Content:     template.HTML(post.content),
+		Preview:     template.HTML(post.preview),
 		PublishDate: post.metadata.publishDate.Format("2 Jan 2006"),
 		Url:         post.urlPath,
 		Tags:        post.metadata.tags,
-	}, nil
+	}
 }
 
 func comData() commonData {

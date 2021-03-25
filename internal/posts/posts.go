@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"sync"
@@ -22,13 +23,30 @@ import (
 )
 
 type (
-	DirSet map[string]bool
-	Posts  []*Post
+	DirSet     map[string]bool
+	Posts      []*Post
+	renderMode int
+)
+
+const (
+	linkNameMaxLength = 50
+
+	// Render the full post except the title
+	renderPost renderMode = 0
+	// Render a preview of the post (the first paragraph)
+	renderPreview renderMode = 1
+	// Render the title of the post (the first heading)
+	renderTitle renderMode = 2
 )
 
 // Keeps track of seen directories to catch duplicates
-var uniqueDirs = make(map[string]*Post)
-var uniqueDirsLock sync.Mutex
+var (
+	uniqueDirs     = make(map[string]*Post)
+	uniqueDirsLock sync.Mutex
+
+	// Dangerous characters that can cause problems in file names and URLs
+	linkNameDangerous = regexp.MustCompile(`[/?.:=%#\t\n]`)
+)
 
 type Post struct {
 	dir         string
@@ -39,6 +57,11 @@ type Post struct {
 	urlPath  string
 	metadata *PostMetadata
 
+	content  string
+	preview  string
+	title    string
+	linkName string
+
 	published bool
 }
 
@@ -46,9 +69,11 @@ type Post struct {
 // Implements markdown.Rendere
 type postRenderer struct {
 	htmlRenderer *html.Renderer
-	preview      bool
 
+	mode      renderMode
 	rendering bool
+
+	seenTitle bool
 }
 
 // Functions to sort a list of posts by publish date with newest first
@@ -235,11 +260,36 @@ func (p *Post) build(outputDir string) error {
 		return nil
 	}
 
+	// Parse markdown content and save
+	mdContent, err := ioutil.ReadFile(p.contentFile)
+	if err != nil {
+		return err
+	}
+	p.content = parsePostMarkdown(mdContent, renderPost)
+	p.preview = parsePostMarkdown(mdContent, renderPreview)
+	p.title = parsePostMarkdown(mdContent, renderTitle)
+
+	// If no link name has been given make one from the title
+	p.linkName = p.metadata.linkName
+	if p.linkName == "" {
+		linkRunes := []rune(linkNameDangerous.ReplaceAllString(p.title, ""))
+		maxLength := linkNameMaxLength
+		if len(linkRunes) < maxLength {
+			maxLength = len(linkRunes)
+		}
+		p.linkName = string(linkRunes[:maxLength])
+	}
+
+	// Remove potentially dangerous characters from link name, convert spaces
+	// to dashes and lowercase
+	p.linkName = linkNameDangerous.ReplaceAllString(p.linkName, "")
+	p.linkName = strings.ToLower(strings.ReplaceAll(p.linkName, " ", "-"))
+
 	// Build filepath for post from publish date and linkname
 	year := p.metadata.publishDate.Format("2006")
 	month := p.metadata.publishDate.Format("01")
-	p.urlPath = strings.Join([]string{config.Values.BaseUrlPath, year, month, p.metadata.linkName}, "/")
-	p.outputDir = filepath.Join(outputDir, year, month, p.metadata.linkName)
+	p.urlPath = strings.Join([]string{config.Values.BaseUrlPath, year, month, p.linkName}, "/")
+	p.outputDir = filepath.Join(outputDir, year, month, p.linkName)
 
 	// Do a uniqueness check on directory name
 	uniqueDirsLock.Lock()
@@ -276,53 +326,69 @@ func (p *Post) build(outputDir string) error {
 	return nil
 }
 
-// htmlContent returns the content of the post in HTML.
-// If getting a preview only returns the content for the first paragraph and
-// any headings above the first paragraph if they exist.
-func (p *Post) htmlContent(preview bool) ([]byte, error) {
-	mdContent, err := ioutil.ReadFile(p.contentFile)
-	if err != nil {
-		return nil, err
-	}
-
+func parsePostMarkdown(mdContent []byte, mode renderMode) string {
 	opts := html.RendererOptions{Flags: html.CommonFlags}
 	renderer := &postRenderer{
 		htmlRenderer: html.NewRenderer(opts),
-		preview:      preview,
+		mode:         mode,
 	}
 
-	return markdown.ToHTML(mdContent, nil, renderer), nil
+	return string(markdown.ToHTML(mdContent, nil, renderer))
 }
 
 // markdown.Renderer.RenderNode() implementation
 func (r *postRenderer) RenderNode(w io.Writer, node ast.Node, entering bool) ast.WalkStatus {
-	// Handle rendering a preview
-	// Shows only first paragraph and any headings before it
-	if r.preview {
+	if r.mode == renderPost {
+		r.rendering = true
+		// Render whole post except title (the first heading)
+		if !r.seenTitle {
+			switch node.(type) {
+			case *ast.Heading:
+				if entering {
+					return ast.SkipChildren
+				} else {
+					r.seenTitle = true
+					return ast.GoToNext
+				}
+			}
+		}
+	} else if r.mode == renderPreview {
+		// Render a preview of the post (the first paragraph)
 		switch node.(type) {
 		case *ast.Paragraph:
 			if entering {
-				// Entering a paragraph so start rendering
+				// Entering first paragraph so start rendering
 				r.rendering = true
 			} else {
-				// Leaving a paragraph so we've done the preview so render the end of the
-				// paragraph and terminate
+				// Leaving first paragraph so render end and terminate
 				r.htmlRenderer.RenderNode(w, node, entering)
 				r.rendering = false
 				return ast.Terminate
 			}
+		}
+	} else if r.mode == renderTitle {
+		// Render the title of the post (the first heading)
+		switch node.(type) {
 		case *ast.Heading:
-			// Hit a header before a paragraph so render it then disable rendering when leaving
-			r.rendering = entering
-		default:
-			if !r.rendering {
-				// If we're not rendering skip this node
+			if entering {
+				// Entering first heading so start rendering but don't add opening tag
+				r.rendering = true
 				return ast.GoToNext
+			} else {
+				// Leaving first heading so we've rendered it all
+				r.rendering = false
+				return ast.Terminate
 			}
 		}
+	} else {
+		log.Fatalf("Unknown render mode %v", r.mode)
 	}
 
-	return r.htmlRenderer.RenderNode(w, node, entering)
+	if r.rendering {
+		return r.htmlRenderer.RenderNode(w, node, entering)
+	} else {
+		return ast.GoToNext
+	}
 }
 
 // markdown.Renderer.RenderHeader() implementation
