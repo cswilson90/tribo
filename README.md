@@ -25,8 +25,8 @@ $ tribo
 
 This will build the example blog and install it in `/srv/blog`.
 
-If you have your own blog already set up you should run the tribo command from
-that directory.
+If you have your own blog directory already set up you should run the tribo
+command from that directory.
 
 To view the blog you will then need to install and run a webserver.
 Below is an example nginx config to serve the site.
@@ -228,14 +228,16 @@ postListPageData {
 }
 
 commonData {
-    BaseURLPath: string, // The base path of the blog on the server
-    BlogName:    string, // The global name of the blog
-    PageTitle:   string, // A title for the page to be used as the HTML title
+    BaseURLPath:    string, // The base path of the blog on the server
+    BlogName:       string, // The global name of the blog
+    BlogDescription string, // The global description of the blog
+    PageTitle:      string, // A title for the page to be used as the HTML title
 }
 
 postData {
     Title:       string,        // The title of the blog post
     Content:     template.HTML, // The HTML content of the post (in a format compatible with the `html/template` package)
+    Preview:     template.HTML, // The HTML content of the preview of the post
     PublishDate: string         // The publish date of the blog post in "01 Jan 2000" format
     Url:         string         // The direct URL link for the post
     Tags:        [ string ]     // A list of tags attached to the post
