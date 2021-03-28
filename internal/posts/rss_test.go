@@ -33,6 +33,7 @@ func TestRSS(t *testing.T) {
 				publishDate: time.Date(2021, time.March, 17, 0, 0, 0, 0, time.UTC),
 			},
 			title:     "Test Post 1",
+			preview:   "<p>Preview Paragraph</p>",
 			published: true,
 		},
 		&Post{
@@ -41,6 +42,7 @@ func TestRSS(t *testing.T) {
 				publishDate: time.Date(2021, time.February, 24, 0, 0, 0, 0, time.UTC),
 			},
 			title:     "Test Post 2",
+			preview:   " <p> Description  </p>",
 			published: true,
 		},
 		&Post{
@@ -49,8 +51,15 @@ func TestRSS(t *testing.T) {
 				publishDate: time.Date(2021, time.January, 12, 0, 0, 0, 0, time.UTC),
 			},
 			title:     "Test Post 3",
+			preview:   "<p> Description Paragraph</p> ",
 			published: true,
 		},
+	}
+
+	expectedDescriptions := []string{
+		"Preview Paragraph",
+		"Description",
+		"Description Paragraph",
 	}
 
 	tmpDir := t.TempDir()
@@ -89,7 +98,7 @@ func TestRSS(t *testing.T) {
 	for i, item := range items {
 		assert.Equal(posts[i].title, item.Title, "Incorrect title for post %v", i)
 		assert.Equal(rssLinkUrl+posts[i].urlPath, item.Link, "Incorrect link for post %v", i)
-		assert.Equal("", item.Description, "Incorrect description for post %v", i)
+		assert.Equal(expectedDescriptions[i], item.Description, "Incorrect description for post %v", i)
 		assert.Equal(rssLinkUrl+posts[i].urlPath, item.Guid, "Incorrect guid for post %v", i)
 		assert.Equal(posts[i].metadata.publishDate.Format(RSSDateFormat), item.PubDate, "Incorrect pubdate for post %v", i)
 	}

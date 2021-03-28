@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/xml"
 	"os"
+	"regexp"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -12,6 +13,11 @@ import (
 )
 
 const RSSDateFormat = "Mon, 02 Jan 2006 15:04:05 MST"
+
+var (
+	removeOpeningPTag = regexp.MustCompile(`^\s*<p>\s*`)
+	removeClosingPTag = regexp.MustCompile(`\s*</p>\s*$`)
+)
 
 type RSSXML struct {
 	XMLName xml.Name    `xml:"rss"`
@@ -56,10 +62,14 @@ func postRSSFeed(posts Posts, outputFile string) {
 
 		postLink := config.Values.RssLinkUrl + post.urlPath
 
+		// Post description is preview paragraph with opening and closing paragraph tags
+		description := removeOpeningPTag.ReplaceAllLiteralString(post.preview, "")
+		description = removeClosingPTag.ReplaceAllLiteralString(description, "")
+
 		postsXML[i] = &ItemXML{
 			Title:       post.title,
 			Link:        postLink,
-			Description: "",
+			Description: description,
 			Guid:        postLink,
 			PubDate:     post.metadata.publishDate.Format(RSSDateFormat),
 		}
