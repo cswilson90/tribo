@@ -25,8 +25,9 @@ type TriboConfig struct {
 	StaticDir   string `yaml:"staticDir"`
 	TemplateDir string `yaml:"templateDir"`
 
-	Parallelism int  `yaml:"parallelism"`
-	FuturePosts bool `yaml:"futurePosts"`
+	Parallelism     int  `yaml:"parallelism"`
+	FuturePosts     bool `yaml:"futurePosts"`
+	NoOutputCleanup bool `yaml:"noOutputCleanup"`
 }
 
 var (
@@ -45,8 +46,9 @@ var (
 		StaticDir:   "static",
 		TemplateDir: "templates",
 
-		Parallelism: runtime.NumCPU(),
-		FuturePosts: false,
+		Parallelism:     runtime.NumCPU(),
+		FuturePosts:     false,
+		NoOutputCleanup: false,
 	}
 )
 
@@ -77,6 +79,7 @@ func Init(cmdArgs []string) {
 
 	parallelism := flags.Int("parallelism", 0, "max parallelism")
 	futurePosts := flags.Bool("futurePosts", false, "publish future posts")
+	noOutputCleanup := flags.Bool("noOutputCleanup", false, "don't attempt to clean up output directory")
 	flags.Parse(cmdArgs)
 
 	// Load values from config file into Values
@@ -110,8 +113,11 @@ func Init(cmdArgs []string) {
 	if *parallelism != 0 {
 		Values.Parallelism = *parallelism
 	}
-	if *futurePosts && !Values.FuturePosts {
+	if *futurePosts {
 		Values.FuturePosts = *futurePosts
+	}
+	if *noOutputCleanup {
+		Values.NoOutputCleanup = *noOutputCleanup
 	}
 
 	// Convert file/path arguments into absolute paths

@@ -29,7 +29,17 @@ func TestBuildPosts(t *testing.T) {
 	config.Values.TemplateDir = templateDir
 
 	tmpDir := t.TempDir()
+
+	// Add extra post directory to output which should be removed automatically
+	fakePostDir := filepath.Join(tmpDir, "2020/04/old-post")
+	os.MkdirAll(fakePostDir, 0775)
+
 	BuildPosts(inputDir, tmpDir)
+
+	// Check extra post directory has been removed
+	if _, err := os.Stat(fakePostDir); !os.IsNotExist(err) {
+		t.Errorf("Old post directory hasn't been removed")
+	}
 
 	expectedDirs := []string{
 		"2021/01/2021-01-post-1/",

@@ -46,6 +46,10 @@ var (
 
 	// Dangerous characters that can cause problems in file names and URLs
 	linkNameDangerous = regexp.MustCompile(`[/?.:=%#\t\n]`)
+
+	// Regexes for checking if string looks like year or month
+	looksLikeYear  = regexp.MustCompile(`^\d{4}$`)
+	looksLikeMonth = regexp.MustCompile(`^\d{2}$`)
 )
 
 type Post struct {
@@ -138,6 +142,12 @@ func BuildPosts(inputDir, outputDir string) {
 	}
 
 	sort.Sort(publishedPosts)
+
+	// Remove directories from output that don't have a published post
+	err = removeExtraOutputDirs(outputDir)
+	if err != nil {
+		log.Errorf("Failed to clean up non-existent posts from output directory: %v", err.Error())
+	}
 
 	// Output list of posts HTML
 	indexFile := filepath.Join(absOutputDir, "index.html")
@@ -334,6 +344,49 @@ func parsePostMarkdown(mdContent []byte, mode renderMode) string {
 	}
 
 	return string(markdown.ToHTML(mdContent, nil, renderer))
+}
+
+// removeExtraOutputDirs removes directories from the output that don't have a post
+// from the current run.
+func removeExtraOutputDirs(outputDir string) error {
+	outputFileList, err := ioutil.ReadDir(outputDir)
+	if err != nil {
+		return err
+	}
+
+	uniqueDirsLock.Lock()
+	defer uniqueDirsLock.Unlock()
+
+	for _, outputFile := range outputFileList {
+		if outputFile.IsDir() && looksLikeYear.MatchString(outputFile.Name()) {
+			yearDir := filepath.Join(outputDir, outputFile.Name())
+			yearFileList, err := ioutil.ReadDir(yearDir)
+			if err != nil {
+				return err
+			}
+
+			for _, yearFile := range yearFileList {
+				if yearFile.IsDir() && looksLikeMonth.MatchString(yearFile.Name()) {
+					monthDir := filepath.Join(yearDir, yearFile.Name())
+					monthFileList, err := ioutil.ReadDir(monthDir)
+					if err != nil {
+						return err
+					}
+
+					for _, monthFile := range monthFileList {
+						if monthFile.IsDir() {
+							postDir := filepath.Join(monthDir, monthFile.Name())
+							if uniqueDirs[postDir] == nil {
+								os.RemoveAll(postDir)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 // markdown.Renderer.RenderNode() implementation

@@ -24,6 +24,7 @@ var tests = []struct {
 			TemplateDir:     "templates",
 			Parallelism:     runtime.NumCPU(),
 			FuturePosts:     false,
+			NoOutputCleanup: false,
 		},
 	},
 	{
@@ -33,6 +34,7 @@ var tests = []struct {
 			"-parallelism", "8",
 			"-futurePosts",
 			"-rssLinkUrl", "https://example.com",
+			"-noOutputCleanup",
 		},
 		expectedValues: TriboConfig{
 			BlogName:        "My Blog",
@@ -44,6 +46,7 @@ var tests = []struct {
 			TemplateDir:     "templates",
 			Parallelism:     8,
 			FuturePosts:     true,
+			NoOutputCleanup: true,
 		},
 	},
 	{
@@ -58,6 +61,7 @@ var tests = []struct {
 			TemplateDir:     "other/templates",
 			Parallelism:     runtime.NumCPU(),
 			FuturePosts:     true,
+			NoOutputCleanup: false,
 		},
 	},
 }

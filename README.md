@@ -197,6 +197,7 @@ The following can be configured:
 | templateDir | `templates`    | The directory which stores the templates used to generate the pages of the blog. Default is `templates/` in the working directory.                                                                               |
 | parallelism | Number of CPUs | The max number of blog posts generated in parallel at the same time. Defaults to the number of CPUs available on the machine.                                                                                    |
 | futurePosts | `false`        | Whether to publish posts with a publish date in the future. Values in YAML should be `true`/`false`, the flag can be given with no arguments on the command line to enable.                                      |
+| noOutputCleanup | `false`    | By default Tribo will delete any directories from the output directory that it thinks are from posts which no longer exist or have been moved due to a title or published date change. You can set this option to `true` to stop this behaviour if it is causing problems. |
 
 ## Writing Your Own Templates
 
