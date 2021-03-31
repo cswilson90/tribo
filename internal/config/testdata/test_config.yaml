@@ -4,3 +4,4 @@ templateDir: other/templates
 futurePosts: true
 blogName: "Test Blog"
 blogDescription: "A blog for my test"
+noRss: true

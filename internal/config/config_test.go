@@ -17,6 +17,7 @@ var tests = []struct {
 		expectedValues: TriboConfig{
 			BlogName:        "My Blog",
 			BlogDescription: "My musings about the world",
+			NoRss:           false,
 			RssLinkUrl:      "http://127.0.0.1",
 			OutputDir:       "blog",
 			PostsDir:        "posts",
@@ -39,6 +40,7 @@ var tests = []struct {
 		expectedValues: TriboConfig{
 			BlogName:        "My Blog",
 			BlogDescription: "My musings about the world",
+			NoRss:           false,
 			RssLinkUrl:      "https://example.com",
 			OutputDir:       "/home/test/output",
 			PostsDir:        "other/posts",
@@ -54,6 +56,7 @@ var tests = []struct {
 		expectedValues: TriboConfig{
 			BlogName:        "Test Blog",
 			BlogDescription: "A blog for my test",
+			NoRss:           true,
 			RssLinkUrl:      "http://127.0.0.1",
 			OutputDir:       "/home/test/output",
 			PostsDir:        "posts",

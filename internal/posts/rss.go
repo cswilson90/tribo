@@ -48,6 +48,11 @@ type ItemXML struct {
 // postRSSFeed outputs the RSS feed for the blog.
 // posts should be presorted by date
 func postRSSFeed(posts Posts, outputFile string) {
+	if config.Values.NoRss {
+		log.Infof("Not generating RSS file as it's disabled in the config")
+		return
+	}
+
 	log.Infof("Writing RSS XML to '%v'", outputFile)
 
 	// Add newest 10 posts to RSS feed

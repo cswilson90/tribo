@@ -25,13 +25,16 @@ type TriboConfig struct {
 	BlogName        string `yaml:"blogName"`
 	BlogDescription string `yaml:"blogDescription"`
 
+	// NoRss controls whether an RSS feed is generated.
+	// The default value is false so an RSS feed will be generated.
+	NoRss bool `yaml:"noRss"`
 	/*
 		RssLinkURL is used to build absolute links when linking to posts in the RSS feed.
 		It should be set to the scheme and hostname of the URL the blog is served from.
 		The BaseURLPath is appended to this value to build the links.
 		For example if the blog is served from http://example.com/blog/ you should set
 		this value to "http://example.com/".
-		Can be ignored if you don't care about the RSS feed.
+		Can be ignored if NoRss is set to true.
 	*/
 	RssLinkUrl string `yaml:"rssLinkUrl"`
 
@@ -101,6 +104,7 @@ func Init(cmdArgs []string) {
 	blogDescription := flags.String("blogDescription", "", "blog description")
 	baseUrlPath := flags.String("baseUrlPath", "", "base blog URL path")
 
+	noRss := flags.Bool("noRss", false, "don't generate an RSS feed")
 	rssLinkUrl := flags.String("rssLinkUrl", "", "RSS link base URL")
 
 	outputDir := flags.String("outputDir", "", "output directory")
@@ -125,6 +129,9 @@ func Init(cmdArgs []string) {
 	}
 	if *baseUrlPath != "" {
 		Values.BaseUrlPath = *baseUrlPath
+	}
+	if *noRss {
+		Values.NoRss = *noRss
 	}
 	if *rssLinkUrl != "" {
 		Values.RssLinkUrl = *rssLinkUrl
