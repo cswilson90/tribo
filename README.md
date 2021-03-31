@@ -233,6 +233,7 @@ commonData {
     BlogName:       string, // The global name of the blog
     BlogDescription string, // The global description of the blog
     PageTitle:      string, // A title for the page to be used as the HTML title
+    CurrentYear:    string, // The current year as a string (for use in copyright notice)
 }
 
 postData {

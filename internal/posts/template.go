@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -16,6 +17,7 @@ type commonData struct {
 	BaseUrlPath     string
 	BlogName        string
 	BlogDescription string
+	CurrentYear     string
 	PageTitle       string
 }
 
@@ -137,6 +139,7 @@ func comData() commonData {
 		BaseUrlPath:     config.Values.BaseUrlPath,
 		BlogName:        config.Values.BlogName,
 		BlogDescription: config.Values.BlogDescription,
+		CurrentYear:     time.Now().Format("2006"),
 		PageTitle:       config.Values.BlogName,
 	}
 }
