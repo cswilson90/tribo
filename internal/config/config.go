@@ -13,11 +13,26 @@ import (
 
 const defaultConfigFile = ".tribo.yaml"
 
+// TriboConfig stores all config values for Tribo.
 type TriboConfig struct {
+	/*
+		BaseUrlPath is the base path of the blog on the hostname where it's hosted.
+		For example if the blog is hosted at http://example.com/blog/ you would set
+		this config value to "/blog".
+		The value can be left blank if the blog is served from the root of the site.
+	*/
 	BaseUrlPath     string `yaml:"baseUrlPath"`
 	BlogName        string `yaml:"blogName"`
 	BlogDescription string `yaml:"blogDescription"`
 
+	/*
+		RssLinkURL is used to build absolute links when linking to posts in the RSS feed.
+		It should be set to the scheme and hostname of the URL the blog is served from.
+		The BaseURLPath is appended to this value to build the links.
+		For example if the blog is served from http://example.com/blog/ you should set
+		this value to "http://example.com/".
+		Can be ignored if you don't care about the RSS feed.
+	*/
 	RssLinkUrl string `yaml:"rssLinkUrl"`
 
 	OutputDir   string `yaml:"outputDir"`
@@ -25,13 +40,29 @@ type TriboConfig struct {
 	StaticDir   string `yaml:"staticDir"`
 	TemplateDir string `yaml:"templateDir"`
 
-	Parallelism     int  `yaml:"parallelism"`
-	FuturePosts     bool `yaml:"futurePosts"`
+	// Parallelism controls the max number of blog posts built in parallel.
+	// Defaults to the number of CPUs available on the machine.
+	Parallelism int `yaml:"parallelism"`
+	// FuturePosts controls whether blog posts with a publish date set in the future
+	// are published.
+	FuturePosts bool `yaml:"futurePosts"`
+	// NoOutputCleanup controls whether Tribo tries to clean up old blog posts in the output.
+	// By default Tribo will delete any directories from the output directory that it thinks are
+	// from posts which no longer exist or have been moved due to a title or published date change.
+	// You can set this option to true to stop this behaviour if it is causing problems.
 	NoOutputCleanup bool `yaml:"noOutputCleanup"`
 }
 
 var (
-	// Values contains all the config variables for Tribo.
+	/*
+		Values contains all the config variables for Tribo.
+		Other parts of the program should access the config values using this variable.
+
+			import "github.com/cswilson/tribo/internal/config"
+
+			baseURLPath := config.Values.BaseUrlPath
+
+	*/
 	Values TriboConfig
 
 	// defaultConfig defines the default values for the config.
@@ -127,6 +158,8 @@ func Init(cmdArgs []string) {
 	Values.TemplateDir = absPath(Values.TemplateDir)
 }
 
+// absPath converts a file path to an absolute path.
+// If the file path cannot be converted then the program will exit with an error.
 func absPath(file string) string {
 	absPath, err := filepath.Abs(file)
 	if err != nil {
@@ -136,6 +169,7 @@ func absPath(file string) string {
 	return absPath
 }
 
+// loadConfigFile loads the config from a file into the Values variable.
 func loadConfigFile(configFile string) {
 	configFileGiven := configFile != defaultConfigFile
 
