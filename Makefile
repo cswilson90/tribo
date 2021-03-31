@@ -1,7 +1,10 @@
-all: clean build
+all: clean test build
 
 build:
 	go build -o output/tribo cmd/tribo/main.go
 
 clean:
-	rm output/*
+	rm -f output/*
+
+test:
+	go test ./...
