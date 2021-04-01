@@ -13,36 +13,44 @@ import (
 	"github.com/cswilson90/tribo/internal/config"
 )
 
+// commonData contains template data comon to rendering all the post templates.
 type commonData struct {
+	// BaseUrlPath is the path prefix used when serving the blog.
+	// e.g. if blog is at http://example.com/blog/ the BaseUrlPath would be "/blog"
 	BaseUrlPath     string
 	BlogName        string
 	BlogDescription string
 	CurrentYear     string
-	PageTitle       string
+	// PageTitle is the HTML title of the page.
+	PageTitle string
 }
 
+// postData contains the template data for a single blog post.
 type postData struct {
 	Title       string
 	Content     template.HTML
 	Preview     template.HTML
 	PublishDate string
-	Url         string
-	Tags        []string
+	// Url is the URL used to link to the post.
+	Url  string
+	Tags []string
 }
 
-// Passed to post_list.html.tmpl
+// postListPageData contains all the template data for rendering the post list page.
 type postListPageData struct {
-	Common  commonData
-	Posts   []postData
+	Common commonData
+	Posts  []postData
+	// AllTags is a list of unique tags from all the posts that are in the post list.
 	AllTags []string
 }
 
-// Passed to post.html.tmpl
+// postPageData contains all the template data for rendering a single blog post page.
 type postPageData struct {
 	Common commonData
 	Post   postData
 }
 
+// tmpl stores the parsed templates used to render all post output.
 var tmpl *template.Template
 
 // initTemplates initialises the Template variable for use when generating posts.
@@ -65,6 +73,7 @@ func initTemplates() error {
 }
 
 // postToHTML generates a posts HTML content and writes it to an output file.
+// It uses the "post.html.tmpl" template.
 func postToHTML(post *Post, outputFilename string) error {
 	postData := postToPostData(post, false)
 	tmplData := postPageData{
@@ -78,6 +87,7 @@ func postToHTML(post *Post, outputFilename string) error {
 }
 
 // postListHTML generates the HTML for the list of posts used as the main page for the blog.
+// It uses the "post_list.html.tmpl" template file.
 func postListHTML(posts Posts, outputFilename string) error {
 	tmplData := postListPageData{
 		Common: comData(),
@@ -104,6 +114,7 @@ func postListHTML(posts Posts, outputFilename string) error {
 	return renderTemplate("post_list.html.tmpl", outputFilename, tmplData)
 }
 
+// renderTemplate renders a template and saves the output to a file.
 func renderTemplate(templateName, outputFilename string, tmplData interface{}) error {
 	outputFile, err := os.Create(outputFilename)
 	if err != nil {
@@ -123,6 +134,7 @@ func renderTemplate(templateName, outputFilename string, tmplData interface{}) e
 	return nil
 }
 
+// postToPostData generates a postData object from a post.
 func postToPostData(post *Post, previewContent bool) postData {
 	return postData{
 		Title:       post.title,
@@ -134,6 +146,7 @@ func postToPostData(post *Post, previewContent bool) postData {
 	}
 }
 
+// commonData returns a commonData object that can be used when rendering a template.
 func comData() commonData {
 	return commonData{
 		BaseUrlPath:     config.Values.BaseUrlPath,

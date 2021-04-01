@@ -49,9 +49,33 @@ server {
 ```
 
 You can use any webserver. You just need to configure it to serve static files out of `/srv/blog`.
+You will also need to make sure it is setup to use `index.html` as an index page.
 
 You can then view the example blog by visiting `http://127.0.0.1/` in a browser on the machine
 running the webserver.
+
+## Program Output
+
+### Blog post listing
+
+The program generates a listing of all blog posts available on the blog. This is stored in
+`index.html` in the root directory of the blog so is the default page seen when visting
+`http://127.0.0.1/`.
+
+### Blog posts
+
+Each blog post is stored in it's own directory. The directory the post will be stored in is
+formed from the publish date and title of the post. If a post has the title "Test Post" and
+a publish date of "1st April 2021" it will be stored in `2021/04/test-post/` and will be
+available at the URL `http://127.0.0.1/2021/04/test-post/`.
+
+### RSS feed
+
+By default the program will generate an RSS feed for the blog and save it as `rss.xml` in the
+root output directory. This will be available on the webserver at `http://127.0.0.1/rss.xml`.
+
+You can disabled generation of the RSS feed using the noRss
+[configuration option](#program-configuration).
 
 ## Blog Directory Layout
 

@@ -12,6 +12,7 @@ import (
 	"github.com/cswilson90/tribo/internal/config"
 )
 
+// RSSDateFormat is the format used to output dates in the RSS feed
 const RSSDateFormat = "Mon, 02 Jan 2006 15:04:05 MST"
 
 var (
@@ -19,12 +20,17 @@ var (
 	removeClosingPTag = regexp.MustCompile(`\s*</p>\s*$`)
 )
 
+// RSSXML describes the top level format used to encode the data into XML for the RSS feed.
+// See the RSS specification for more information.
 type RSSXML struct {
 	XMLName xml.Name    `xml:"rss"`
 	Version string      `xml:"version,attr"`
 	Channel *ChannelXML `xml:"channel"`
 }
 
+// ChannelXML describes the structure or the XML for the channel of the RSS feed.
+// A channel in the RSS feed corresponds to the whole blog.
+// See the RSS specification for more information.
 type ChannelXML struct {
 	XMLName       xml.Name   `xml:"channel"`
 	Title         string     `xml:"title"`
@@ -36,6 +42,9 @@ type ChannelXML struct {
 	Items         []*ItemXML `xml:"item"`
 }
 
+// ItemXML describes the structure if the XML for a single item in the RSS feed.
+// An item in the RSS feed corresponds to a single blog post.
+// See the RSS specification for more information.
 type ItemXML struct {
 	XMLName     xml.Name `xml:"item"`
 	Title       string   `xml:"title"`
@@ -46,7 +55,8 @@ type ItemXML struct {
 }
 
 // postRSSFeed outputs the RSS feed for the blog.
-// posts should be presorted by date
+// The RSS feed is saved in "rss.xml" in the root directory of the blog.
+// The posts should be sorted by date published.
 func postRSSFeed(posts Posts, outputFile string) {
 	if config.Values.NoRss {
 		log.Infof("Not generating RSS file as it's disabled in the config")
@@ -67,7 +77,8 @@ func postRSSFeed(posts Posts, outputFile string) {
 
 		postLink := config.Values.RssLinkUrl + post.urlPath
 
-		// Post description is preview paragraph with opening and closing paragraph tags
+		// Post description is the post preview paragraph with opening and closing
+		// paragraph tags removed
 		description := removeOpeningPTag.ReplaceAllLiteralString(post.preview, "")
 		description = removeClosingPTag.ReplaceAllLiteralString(description, "")
 
@@ -109,10 +120,11 @@ func postRSSFeed(posts Posts, outputFile string) {
 
 	xmlWriter := bufio.NewWriter(xmlFile)
 	xmlWriter.WriteString(xml.Header)
+
 	xmlEncoder := xml.NewEncoder(xmlWriter)
 	xmlEncoder.Indent("", "  ")
 
-	// Encode calls Flush on Writer
+	// Encode calls Flush on Writer so don't need to flush afterwards
 	err = xmlEncoder.Encode(rssXML)
 	if err != nil {
 		log.Errorf("Failed to write RSS file: " + err.Error())

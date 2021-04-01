@@ -1,3 +1,21 @@
+/*
+	Package config parses the Tribo config file and command line arguments and
+	provides access to the values.
+
+	The Init() function should be called before trying to use any of the config
+	values.
+
+	All values should be accessed from the Values variable.
+
+		import (
+			"os"
+
+			"github.com/cswilson90/tribo/internal/config"
+		)
+
+		config.Init(os.Args[1:])
+		baseURLPath := config.Values.BaseUrlPath
+*/
 package config
 
 import (

@@ -13,13 +13,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const (
-	dateFormat = "2006-01-02"
-)
+// dateFormat specifies the expected format of publishDates in the metadata.
+const dateFormat = "2006-01-02"
 
-var (
-	metadataMatch = regexp.MustCompile(`^metadata\.(json|ya?ml)$`)
-)
+var metadataMatch = regexp.MustCompile(`^metadata\.(json|ya?ml)$`)
 
 // PostMetadata stores the metadata about a post.
 type PostMetadata struct {
@@ -47,6 +44,7 @@ func parseMetadata(dir string) (*PostMetadata, error) {
 		return nil, err
 	}
 
+	// Look for metadata files, there should be exactly one
 	metaFiles := make([]string, 0)
 	for _, file := range fileList {
 		if isMetadataFile(file.Name()) {

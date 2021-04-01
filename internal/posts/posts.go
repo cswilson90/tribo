@@ -1,3 +1,8 @@
+/*
+	posts parses blog posts and generates the static output of the blog.
+
+	To generate the output call BuildPosts()
+*/
 package posts
 
 import (
@@ -31,16 +36,16 @@ type (
 const (
 	linkNameMaxLength = 50
 
-	// Render the full post except the title
+	// renderPost renders the full post except the title
 	renderPost renderMode = 0
-	// Render a preview of the post (the first paragraph)
+	// renderPreview renders a preview of the post (the first paragraph)
 	renderPreview renderMode = 1
-	// Render the title of the post (the first heading)
+	// renderTitle renders the title of the post (the first heading)
 	renderTitle renderMode = 2
 )
 
-// Keeps track of seen directories to catch duplicates
 var (
+	// uniqueDirs keeps track of output directories of posts to catch duplicates.
 	uniqueDirs     = make(map[string]*Post)
 	uniqueDirsLock sync.Mutex
 
@@ -52,31 +57,47 @@ var (
 	looksLikeMonth = regexp.MustCompile(`^\d{2}$`)
 )
 
+// Post is a structure that contains all teh information about a single post.
 type Post struct {
-	dir         string
-	outputDir   string
+	// dir is the input directory that the post is created from.
+	dir       string
+	outputDir string
+	// contentFile is the location of the markdown file with post content.
 	contentFile string
+	// resourceDir is the location of the directory containing static resources for the post.
 	resourceDir string
 
+	// urlPath is the path that links to the post on the web server.
 	urlPath  string
 	metadata *PostMetadata
 
-	content  string
-	preview  string
-	title    string
+	content string
+	preview string
+	title   string
+	// linkName is used when creating the path of the post e.g. if a post was published
+	// in April 2021 and had a linkName of "test-post" the URL path would be "2021/04/test-post".
 	linkName string
 
+	// published indicates whether the post has been included in the output.
+	// A post won't be included if their publishDate is in the future or there is a problem
+	// building the post.
 	published bool
 }
 
-// postRenderer renders a post in HTML, supports rendering previews.
-// Implements markdown.Rendere
+/*
+	postRenderer converts post markdown content to HTML.
+
+	Supports rendering the full content, a preview paragraph or just the title.
+	Implements markdown.Renderer
+*/
 type postRenderer struct {
 	htmlRenderer *html.Renderer
 
-	mode      renderMode
-	rendering bool
+	// mode controls whether the full content, preview or title is generated.
+	// Should be set to renderPost, renderPreview or renderTitle
+	mode renderMode
 
+	rendering bool
 	seenTitle bool
 }
 
@@ -87,8 +108,13 @@ func (p Posts) Less(i, j int) bool {
 	return p[i].metadata.publishDate.After(p[j].metadata.publishDate)
 }
 
-// BuildPosts finds all the posts in a directory and builds them.
-// The provided directory is converted to an absolute directory before use.
+/*
+	BuildPosts finds all the posts in a directory and builds them.
+	The provided directories are converted to an absolute directory before use.
+
+	inputDir is the directory where the content of the posts can be found and
+	outputDir is where to output the static content of the blog.
+*/
 func BuildPosts(inputDir, outputDir string) {
 	absInputDir, err := filepath.Abs(inputDir)
 	if err != nil {
@@ -174,7 +200,7 @@ func buildPosts(outputDir string, posts <-chan *Post, wg *sync.WaitGroup) {
 	}
 }
 
-// FindPosts recursively searches a directory for posts.
+// findPosts recursively searches a directory for posts.
 func findPosts(baseDir string) Posts {
 	log.Infof("Looking for posts recursivly in '%v'", baseDir)
 
@@ -256,7 +282,9 @@ func newPost(dir string) (*Post, error) {
 	}, nil
 }
 
-// build builds the post from the directory set in the object.
+// build builds a post.
+// Content is parsed from the input directory of the post.
+// An output directory is created for the post and the built content is saved there.
 func (p *Post) build(outputDir string) error {
 	var err error
 	p.metadata, err = parseMetadata(p.dir)
@@ -336,6 +364,9 @@ func (p *Post) build(outputDir string) error {
 	return nil
 }
 
+// parsePostMarkdown converts the markdown content of the post to a HTML string.
+// The mode argument controls whether the full post, a preview or just the title
+// is generated.
 func parsePostMarkdown(mdContent []byte, mode renderMode) string {
 	opts := html.RendererOptions{Flags: html.CommonFlags}
 	renderer := &postRenderer{
@@ -357,6 +388,9 @@ func removeExtraOutputDirs(outputDir string) error {
 	uniqueDirsLock.Lock()
 	defer uniqueDirsLock.Unlock()
 
+	// Recursively search output directory for directories that look like a post
+	// directory but don't have a corresponding post in the input.
+	// Assumes any directory with a YYYY/MM/ prefix is a post directory.
 	for _, outputFile := range outputFileList {
 		if outputFile.IsDir() && looksLikeYear.MatchString(outputFile.Name()) {
 			yearDir := filepath.Join(outputDir, outputFile.Name())
@@ -390,6 +424,8 @@ func removeExtraOutputDirs(outputDir string) error {
 }
 
 // markdown.Renderer.RenderNode() implementation
+// Generates the full content, a preview or just the title of the post depending
+// on the mode set in the postRenderer.
 func (r *postRenderer) RenderNode(w io.Writer, node ast.Node, entering bool) ast.WalkStatus {
 	if r.mode == renderPost {
 		r.rendering = true
